@@ -2,7 +2,6 @@ import {
   IsString,
   IsNumber,
   IsBoolean,
-  IsObject,
   Min,
   IsNotEmpty,
   ValidateNested,
@@ -31,9 +30,9 @@ export class CreateCarDto {
 
   @IsEnum(BodyType, {
     message:
-      'This body type is not available. Avaulable only sedan, suv, hatchback, coupe, convertible',
+      'This body type is not available. Available only sedan, suv, hatchback, coupe, convertible',
   })
-  body_type: string;
+  body_type: BodyType;
 
   @ValidateNested()
   @Type(() => EngineDto)

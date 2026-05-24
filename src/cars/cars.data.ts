@@ -46,7 +46,7 @@ export const MOCK_CARS: Car[] = [
     model: 'RS6 Avant',
     year: 2023,
     mileage_km: 15000,
-    body_type: 'Wagon',
+    body_type: 'Sedan',
     engine: { volume: '4.0L', type: 'V8', power_hp: 600 },
     color: 'Nardo Grey',
     interior_material: 'Valcona Leather',

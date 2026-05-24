@@ -1,10 +1,12 @@
+import { BodyType } from './body-type.enum';
+
 export interface Car {
   id: string;
   brand: string;
   model: string;
   year: number;
   mileage_km: number;
-  body_type: string;
+  body_type: BodyType;
   engine: {
     volume: string;
     type: string;
