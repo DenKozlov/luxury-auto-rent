@@ -7,5 +7,5 @@ export abstract class CarsRepository {
   abstract create(dto: CreateCarDto): Promise<Car>;
   abstract remove(id: string): Promise<Car>;
   abstract update(id: string, updateCarDto: UpdateCarDto): Promise<Car>;
-  abstract findOne(id: string): Promise<Car | undefined>;
+  abstract findOne(id: string): Promise<Car>;
 }
