@@ -58,11 +58,7 @@ export class CarsController {
   })
   @Get(':id')
   findOne(@Param('id') id: string) {
-    const car = this.carsService.findOne(id);
-    if (!car) {
-      throw new NotFoundException(`Car with ID ${id} not found`);
-    }
-    return car;
+    return this.carsService.findOne(id);
   }
 
   @ApiOperation({ summary: 'Update car by id' })
@@ -78,7 +74,7 @@ export class CarsController {
 
   @ApiOperation({ summary: 'Delete car by id' })
   @ApiResponse({
-    status: 200,
+    status: 204,
     description: 'Car deleted successfully',
     type: CreateCarDto,
   })
