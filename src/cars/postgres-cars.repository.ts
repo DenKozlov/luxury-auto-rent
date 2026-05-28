@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CarsRepository } from './cars.repository';
 import { PrismaService } from '../../prisma.service';
 import { CreateCarDto } from './dto/create-car.dto';
@@ -7,7 +7,7 @@ import { UpdateCarDto } from './dto/update-car.dto';
 
 @Injectable()
 export class PostgresCarsRepository extends CarsRepository {
-  constructor(private readonly prisma: PrismaService) {
+  constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {
     super();
   }
 

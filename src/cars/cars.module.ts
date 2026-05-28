@@ -8,10 +8,7 @@ import { PostgresCarsRepository } from './postgres-cars.repository';
 @Module({
   controllers: [CarsController],
   providers: [
-    {
-      provide: 'CARS_SERVICE',
-      useClass: CarsService,
-    },
+    CarsService,
     PrismaService,
     {
       provide: CarsRepository,

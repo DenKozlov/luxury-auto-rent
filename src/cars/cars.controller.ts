@@ -8,7 +8,7 @@ import {
   Delete,
   Inject,
 } from '@nestjs/common';
-import { CarsService } from './cars.service.js';
+import { CarsService } from './cars.service';
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
 import { ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
@@ -17,7 +17,8 @@ import { CreateCarExample } from './constants/car-examples.mock';
 @Controller('cars')
 export class CarsController {
   constructor(
-    @Inject('CARS_SERVICE') private readonly carsService: CarsService,
+    @Inject(CarsService)
+    private readonly carsService: CarsService,
   ) {}
 
   @ApiOperation({ summary: 'Add new car to the list' })
