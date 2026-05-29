@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DATABASE_URL: 'postgresql://admin:super_secret_password@postgres:5432/cars_database?schema=public'
+      DATABASE_URL: 'postgresql://admin:super_secret_password@localhost:5432/cars_database?schema=public'
 
     services:
       postgres:
@@ -22,11 +22,6 @@ jobs:
           POSTGRES_DB: cars_database
         ports:
           - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
 
     steps:
       - name: Checkout repository
@@ -46,8 +41,7 @@ jobs:
 
       - name: Wait for PostgreSQL
         run: |
-          echo "Waiting for Postgres..."
-          until pg_isready -h postgres -p 5432; do
+          until pg_isready -h localhost -p 5432; do
             sleep 2
           done
 
