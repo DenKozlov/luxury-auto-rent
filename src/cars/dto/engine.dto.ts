@@ -23,6 +23,4 @@ export class EngineDto {
   @IsNumber()
   @Min(0)
   power_hp: number;
-
-  [key: string]: any;
 }
