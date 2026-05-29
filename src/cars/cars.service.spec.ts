@@ -3,7 +3,16 @@ import { CarsService } from './cars.service.js';
 import { CarsRepository } from './cars.repository.js';
 import { NotFoundException } from '@nestjs/common';
 import { createMockCar } from '../../test/fixtures/cars.fixture';
-import { vi, describe, it, expect, beforeEach, Mocked } from 'vitest';
+import {
+  vi,
+  describe,
+  it,
+  expect,
+  beforeEach,
+  Mocked,
+  afterEach,
+} from 'vitest';
+import { CreateCarDto } from './dto/create-car.dto.js';
 
 const mockDbCar = createMockCar();
 

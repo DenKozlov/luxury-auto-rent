@@ -1,16 +1,23 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
-vi.mock('../../../prisma/generated/prisma/client', () => {
-  return {
-    PrismaClient: class {},
-  };
-});
+vi.mock('@prisma/client', () => ({
+  PrismaClient: vi.fn().mockImplementation(() => ({
+    car: {
+      findMany: vi.fn(),
+      findUnique: vi.fn(),
+      findOne: vi.fn(),
+      remove: vi.fn(),
+      update: vi.fn(),
+    },
+  })),
+}));
 
 import { Test, TestingModule } from '@nestjs/testing';
 import { PostgresCarsRepository } from './postgres-cars.repository.js';
 import { PrismaService } from '../../prisma.service.js';
 import { createMockCar } from '../../test/fixtures/cars.fixture';
 import { BodyType } from '@prisma/client';
+import { CreateCarDto } from './dto/create-car.dto.js';
 
 describe('PostgresCarsRepository', () => {
   let repository: PostgresCarsRepository;
@@ -59,7 +66,7 @@ describe('PostgresCarsRepository', () => {
         model: '911 Carrera',
         year: 2024,
         mileage_km: 1000,
-        body_type: BodyType.COUPE,
+        body_type: 'COUPE' as BodyType,
         engine: { volume: '4.0L', type: 'V8', power_hp: 600 },
         color: 'Crayon',
         interior_material: 'Leather',

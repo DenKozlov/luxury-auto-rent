@@ -6,7 +6,7 @@ export const createMockCar = (overrides = {}) => ({
   model: 'RS6 Avant',
   year: 2023,
   mileage_km: 15000,
-  body_type: BodyType.SEDAN,
+  body_type: 'SEDAN' as BodyType,
   engine: { volume: '4.0L', type: 'V8', power_hp: 600 },
   color: 'Nardo Grey',
   interior_material: 'Valcona Leather',
