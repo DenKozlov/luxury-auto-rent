@@ -10,6 +10,9 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
+    env:
+      DATABASE_URL: 'postgresql://admin:super_secret_password@postgres:5432/cars_database?schema=public'
+
     services:
       postgres:
         image: postgres:15-alpine
@@ -43,15 +46,9 @@ jobs:
 
       - name: Run Prisma Migrations
         run: npx prisma migrate deploy
-        env:
-          DATABASE_URL: 'postgresql://admin:super_secret_password@postgres:5432/cars_database?schema=public'
 
       - name: Run Unit & Integration Tests (with 60% Coverage check)
         run: yarn test --watchAll=false
-        env:
-          DATABASE_URL: 'postgresql://admin:super_secret_password@postgres:5432/cars_database?schema=public'
 
       - name: Run E2E Tests
         run: yarn test:e2e
-        env:
-          DATABASE_URL: 'postgresql://admin:super_secret_password@postgres:5432/cars_database?schema=public'
