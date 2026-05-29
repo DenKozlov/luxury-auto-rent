@@ -1,0 +1,31 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client"
+  output   = "./generated/prisma"
+}
+
+model Car {
+  id                String   @id @default(uuid()) 
+  brand             String
+  model             String
+  year              Int    
+  mileage_km        Int     
+  body_type         BodyType
+  engine            Json     
+  color             String
+  interior_material String
+  price_per_day_pln Int    
+  is_available      Boolean  @default(true)
+  createdAt         DateTime @default(now())
+}
+
+enum BodyType {
+  SEDAN
+  SUV
+  HATCHBACK
+  COUPE
+  CONVERTIBLE
+}

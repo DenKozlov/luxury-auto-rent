@@ -3,8 +3,9 @@ import eslint from '@eslint/js';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
+import { defineConfig } from 'eslint/config'; 
 
-export default tseslint.config(
+export default defineConfig([
   {
     ignores: [
       'eslint.config.mjs',
@@ -24,7 +25,10 @@ export default tseslint.config(
       },
       sourceType: 'module',
       parserOptions: {
-        projectService: true,
+        projectService: {
+          allowDefaultProject: ['eslint.config.mjs', 'eslint.config.js', 'webpack.config.js'],
+          defaultProject: 'tsconfig.json',
+        },
         tsconfigRootDir: import.meta.dirname,
       },
     },
@@ -38,4 +42,4 @@ export default tseslint.config(
       '@typescript-eslint/no-unused-vars': ['warn', { 'ignoreRestSiblings': true }],
     },
   },
-);
+]);

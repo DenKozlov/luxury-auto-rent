@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Inject,
 } from '@nestjs/common';
 import { CarsService } from './cars.service';
 import { CreateCarDto } from './dto/create-car.dto';
@@ -15,7 +16,10 @@ import { CreateCarExample } from './constants/car-examples.mock';
 
 @Controller('cars')
 export class CarsController {
-  constructor(private readonly carsService: CarsService) {}
+  constructor(
+    @Inject(CarsService)
+    private readonly carsService: CarsService,
+  ) {}
 
   @ApiOperation({ summary: 'Add new car to the list' })
   @ApiResponse({
