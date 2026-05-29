@@ -49,7 +49,7 @@ jobs:
         run: npx prisma migrate deploy
 
       - name: Run Unit & Integration Tests (with 60% Coverage check)
-        run: yarn test --watchAll=false
+        run: yarn test --coverage
 
       - name: Run E2E Tests
         run: yarn test:e2e

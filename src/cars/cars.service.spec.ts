@@ -3,20 +3,21 @@ import { CarsService } from './cars.service.js';
 import { CarsRepository } from './cars.repository.js';
 import { NotFoundException } from '@nestjs/common';
 import { createMockCar } from '../../test/fixtures/cars.fixture';
+import { vi, describe, it, expect, beforeEach, Mocked } from 'vitest';
 
 const mockDbCar = createMockCar();
 
 describe('CarsService', () => {
   let service: CarsService;
-  let repositoryMock: jest.Mocked<CarsRepository>;
+  let repositoryMock: Mocked<CarsRepository>;
 
   beforeEach(async () => {
     const mockRepoFactory = () => ({
-      findOne: jest.fn(),
-      findAll: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      remove: jest.fn(),
+      findOne: vi.fn(),
+      findAll: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      remove: vi.fn(),
     });
 
     const module: TestingModule = await Test.createTestingModule({
@@ -34,7 +35,7 @@ describe('CarsService', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should return a car if it exists', async () => {

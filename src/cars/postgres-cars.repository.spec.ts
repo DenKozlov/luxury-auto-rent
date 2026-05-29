@@ -1,11 +1,12 @@
-jest.mock(
+import { vi, describe, it, expect, beforeEach } from 'vitest';
+
+vi.mock(
   '/Users/denyskozlov/Documents/GitHub/luxury-auto-rent/prisma/generated/prisma/client',
   () => {
     return {
       PrismaClient: class {},
     };
   },
-  { virtual: true },
 );
 
 import { Test, TestingModule } from '@nestjs/testing';
@@ -21,11 +22,11 @@ describe('PostgresCarsRepository', () => {
   beforeEach(async () => {
     prismaMock = {
       car: {
-        findMany: jest.fn(),
-        create: jest.fn(),
-        findUnique: jest.fn(),
-        update: jest.fn(),
-        delete: jest.fn(),
+        findMany: vi.fn(),
+        create: vi.fn(),
+        findUnique: vi.fn(),
+        update: vi.fn(),
+        delete: vi.fn(),
       },
     };
 
