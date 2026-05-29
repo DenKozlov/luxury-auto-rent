@@ -2,6 +2,7 @@ import { validate } from 'class-validator';
 import { CreateCarDto } from './create-car.dto.js';
 import { BodyType } from '@prisma/client';
 import { EngineDto } from './engine.dto.js';
+import { it, describe, expect } from 'vitest';
 
 const getValidDto = (): CreateCarDto => {
   const dto = new CreateCarDto();
