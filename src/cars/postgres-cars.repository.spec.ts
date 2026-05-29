@@ -1,13 +1,10 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
-vi.mock(
-  '/Users/denyskozlov/Documents/GitHub/luxury-auto-rent/prisma/generated/prisma/client',
-  () => {
-    return {
-      PrismaClient: class {},
-    };
-  },
-);
+vi.mock('../../../prisma/generated/prisma/client', () => {
+  return {
+    PrismaClient: class {},
+  };
+});
 
 import { Test, TestingModule } from '@nestjs/testing';
 import { PostgresCarsRepository } from './postgres-cars.repository.js';
