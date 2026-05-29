@@ -1,1 +1,8 @@
+#!/usr/bin/env sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "=== [1/2] Проверка качества кода (Linting) ==="
 yarn lint-staged
+
+echo "=== [2/2] Проверка тестов и покрытия (Min 60%) ==="
+yarn test --watchAll=false

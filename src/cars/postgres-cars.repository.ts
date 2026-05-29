@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CarsRepository } from './cars.repository';
 import { PrismaService } from '../../prisma.service';
 import { CreateCarDto } from './dto/create-car.dto';
@@ -11,13 +11,12 @@ export class PostgresCarsRepository extends CarsRepository {
     super();
   }
 
-  async findAll(): Promise<Car[]> {
-    const cars = await this.prisma.car.findMany();
-    return cars as Car[];
+  findAll(): Promise<Car[]> {
+    return this.prisma.car.findMany() as Promise<Car[]>;
   }
 
-  async create(dto: CreateCarDto): Promise<Car> {
-    const newCar = await this.prisma.car.create({
+  create(dto: CreateCarDto): Promise<Car> {
+    return this.prisma.car.create({
       data: {
         brand: dto.brand,
         model: dto.model,
@@ -30,43 +29,29 @@ export class PostgresCarsRepository extends CarsRepository {
         price_per_day_pln: dto.price_per_day_pln,
         is_available: dto.is_available ?? true,
       },
-    });
-
-    return newCar as Car;
+    }) as Promise<Car>;
   }
 
-  async remove(id: string): Promise<void> {
-    const car = await this.prisma.car.delete({
-      where: { id },
-    });
+  findOne(id: string): Promise<Car | null> {
+    return this.prisma.car.findUnique({ where: { id } }) as Promise<Car | null>;
+  }
 
-    if (!car) {
-      throw new NotFoundException(`Car with ID ${id} not found`);
+  async update(id: string, updateCarDto: UpdateCarDto): Promise<Car | null> {
+    try {
+      return (await this.prisma.car.update({
+        where: { id },
+        data: updateCarDto,
+      })) as Car;
+    } catch (e) {
+      return null;
     }
   }
 
-  async findOne(id: string): Promise<Car> {
-    const car = await this.prisma.car.findUnique({
-      where: { id },
-    });
-
-    if (!car) {
-      throw new NotFoundException(`Car with ID ${id} not found`);
+  async remove(id: string): Promise<Car | null> {
+    try {
+      return (await this.prisma.car.delete({ where: { id } })) as Car;
+    } catch (e) {
+      return null;
     }
-
-    return car as Car;
-  }
-
-  async update(id: string, updateCarDto: UpdateCarDto): Promise<Car> {
-    const car = await this.prisma.car.update({
-      where: { id },
-      data: updateCarDto,
-    });
-
-    if (!car) {
-      throw new NotFoundException(`Car with ID ${id} not found`);
-    }
-
-    return car as Car;
   }
 }
