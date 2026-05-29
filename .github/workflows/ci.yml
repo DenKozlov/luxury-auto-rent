@@ -44,6 +44,13 @@ jobs:
       - name: Generate Prisma Client
         run: npx prisma generate
 
+      - name: Wait for PostgreSQL
+        run: |
+          echo "Waiting for Postgres..."
+          until pg_isready -h postgres -p 5432; do
+            sleep 2
+          done
+
       - name: Run Prisma Migrations
         run: npx prisma migrate deploy
 
