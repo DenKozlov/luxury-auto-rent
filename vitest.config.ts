@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitest/config';
+import path from 'path';
 
 export default defineConfig({
   test: {
@@ -15,6 +16,11 @@ export default defineConfig({
           statements: 60,
         },
       },
+    },
+  },
+  resolve: {
+    alias: {
+      '@prisma/client': path.resolve(__dirname, './test/prisma-stub.ts'),
     },
   },
 });
