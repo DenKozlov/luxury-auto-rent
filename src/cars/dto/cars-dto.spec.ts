@@ -1,6 +1,5 @@
 import { validate } from 'class-validator';
 import { CreateCarDto } from './create-car.dto.js';
-import { BodyType } from '@prisma/client';
 import { EngineDto } from './engine.dto.js';
 import { it, describe, expect } from 'vitest';
 
@@ -11,7 +10,7 @@ const getValidDto = (): CreateCarDto => {
   dto.model = '911';
   dto.year = 2024;
   dto.mileage_km = 1000;
-  dto.body_type = BodyType.COUPE;
+  dto.body_type = 'COUPE';
   dto.color = 'Crayon';
   dto.interior_material = 'Leather';
   dto.price_per_day_pln = 3000;
