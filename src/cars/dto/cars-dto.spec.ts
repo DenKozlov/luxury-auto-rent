@@ -1,9 +1,3 @@
-import { validate } from 'class-validator';
-import { CreateCarDto } from './create-car.dto.js';
-import { EngineDto } from './engine.dto.js';
-import { it, describe, expect, vi } from 'vitest';
-import * as PrismaModule from '@prisma/client';
-
 vi.mock('@prisma/client', async () => {
   const actual = await vi.importActual<typeof PrismaModule>('@prisma/client');
 
@@ -12,6 +6,12 @@ vi.mock('@prisma/client', async () => {
     PrismaClient: vi.fn().mockImplementation(() => ({})),
   };
 });
+
+import { validate } from 'class-validator';
+import { CreateCarDto } from './create-car.dto.js';
+import { EngineDto } from './engine.dto.js';
+import { it, describe, expect, vi } from 'vitest';
+import * as PrismaModule from '@prisma/client';
 
 const getValidDto = (): CreateCarDto => {
   const dto = new CreateCarDto();
