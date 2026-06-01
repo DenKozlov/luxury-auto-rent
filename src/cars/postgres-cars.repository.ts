@@ -4,6 +4,8 @@ import { PrismaService } from '../../prisma.service';
 import { CreateCarDto } from './dto/create-car.dto';
 import { Car } from './car.interface';
 import { UpdateCarDto } from './dto/update-car.dto';
+import { instanceToPlain } from 'class-transformer';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class PostgresCarsRepository extends CarsRepository {
@@ -16,20 +18,9 @@ export class PostgresCarsRepository extends CarsRepository {
   }
 
   create(dto: CreateCarDto): Promise<Car> {
-    return this.prisma.car.create({
-      data: {
-        brand: dto.brand,
-        model: dto.model,
-        year: dto.year,
-        mileage_km: dto.mileage_km,
-        body_type: dto.body_type,
-        engine: dto.engine,
-        color: dto.color,
-        interior_material: dto.interior_material,
-        price_per_day_pln: dto.price_per_day_pln,
-        is_available: dto.is_available ?? true,
-      },
-    }) as Promise<Car>;
+    const carData = instanceToPlain(dto) as Prisma.CarCreateInput;
+
+    return this.prisma.car.create({ data: carData }) as Promise<Car>;
   }
 
   findOne(id: string): Promise<Car | null> {
@@ -37,10 +28,11 @@ export class PostgresCarsRepository extends CarsRepository {
   }
 
   async update(id: string, updateCarDto: UpdateCarDto): Promise<Car | null> {
+    const carData = instanceToPlain(updateCarDto) as Prisma.CarUpdateInput;
     try {
       return (await this.prisma.car.update({
         where: { id },
-        data: updateCarDto,
+        data: carData,
       })) as Car;
     } catch (e) {
       return null;
