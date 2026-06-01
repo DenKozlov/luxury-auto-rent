@@ -9,7 +9,7 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { EngineDto } from './engine.dto';
-import { BodyType } from '@prisma/client';
+import { BodyType } from '../../../prisma/generated/client';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateCarDto {

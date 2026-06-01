@@ -5,7 +5,7 @@ import { CreateCarDto } from './dto/create-car.dto';
 import { Car } from './car.interface';
 import { UpdateCarDto } from './dto/update-car.dto';
 import { instanceToPlain } from 'class-transformer';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../../prisma/generated/client';
 
 @Injectable()
 export class PostgresCarsRepository extends CarsRepository {

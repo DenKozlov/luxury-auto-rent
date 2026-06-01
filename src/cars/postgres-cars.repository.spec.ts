@@ -16,8 +16,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PostgresCarsRepository } from './postgres-cars.repository.js';
 import { PrismaService } from '../../prisma.service.js';
 import { createMockCar } from '../../test/fixtures/cars.fixture';
-import { BodyType } from '@prisma/client';
-import { CreateCarDto } from './dto/create-car.dto.js';
+import { BodyType } from '../../prisma/generated/client';
 
 describe('PostgresCarsRepository', () => {
   let repository: PostgresCarsRepository;

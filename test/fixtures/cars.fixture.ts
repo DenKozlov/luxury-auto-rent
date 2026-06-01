@@ -1,4 +1,4 @@
-import { BodyType } from '@prisma/client';
+import { BodyType } from '../../prisma/generated/client';
 
 export const createMockCar = (overrides = {}) => ({
   id: 'car_004',

@@ -20,7 +20,10 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@prisma/client': path.resolve(__dirname, './test/prisma-stub.ts'),
+      './prisma/generated/client': path.resolve(
+        __dirname,
+        './test/prisma-stub.ts',
+      ),
     },
   },
 });
