@@ -5,7 +5,7 @@ import { UpdateCarDto } from './dto/update-car.dto';
 export abstract class CarsRepository {
   abstract findAll(): Promise<Car[]>;
   abstract create(dto: CreateCarDto): Promise<Car>;
-  abstract remove(id: string): Promise<void>;
-  abstract update(id: string, updateCarDto: UpdateCarDto): Promise<Car>;
-  abstract findOne(id: string): Promise<Car>;
+  abstract remove(id: string): Promise<Car | null>;
+  abstract update(id: string, updateCarDto: UpdateCarDto): Promise<Car | null>;
+  abstract findOne(id: string): Promise<Car | null>;
 }
