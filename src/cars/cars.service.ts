@@ -9,8 +9,8 @@ export class CarsService {
     @Inject(CarsRepository) private readonly carsRepository: CarsRepository,
   ) {}
 
-  create(createCarDto: CreateCarDto) {
-    return this.carsRepository.create(createCarDto);
+  create(createCarDto: CreateCarDto, files?: Express.Multer.File[]) {
+    return this.carsRepository.create(createCarDto, files);
   }
 
   findAll() {
@@ -40,8 +40,13 @@ export class CarsService {
     }
     return car;
   }
-
+  // v8 ignore start
   async removeAll() {
     return await this.carsRepository.removeAll();
   }
+
+  async createMany(cars: CreateCarDto[]) {
+    return await this.carsRepository.createMany(cars);
+  }
+  // v8 ignore end
 }

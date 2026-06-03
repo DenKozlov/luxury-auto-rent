@@ -6,6 +6,7 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     coverage: {
+      exclude: ['**/prisma/generated/**', '**/dto/**', '**/*.stub.ts'],
       enabled: true,
       reporter: ['text'],
       thresholds: {

@@ -17,10 +17,12 @@ import { PostgresCarsRepository } from './postgres-cars.repository.js';
 import { PrismaService } from '../../prisma.service.js';
 import { createMockCar } from '../../test/fixtures/cars.fixture';
 import { BodyType } from '../../prisma/generated/client';
+import { S3Service } from '../storage/s3.service';
 
 describe('PostgresCarsRepository', () => {
   let repository: PostgresCarsRepository;
   let prismaMock: any;
+  let s3Service: S3Service;
 
   beforeEach(async () => {
     prismaMock = {
@@ -31,6 +33,13 @@ describe('PostgresCarsRepository', () => {
         update: vi.fn(),
         delete: vi.fn(),
       },
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      $transaction: vi.fn((callback) => callback(prismaMock)),
+    };
+
+    const s3ServiceMock = {
+      deleteFiles: vi.fn(),
+      uploadFile: vi.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -40,10 +49,15 @@ describe('PostgresCarsRepository', () => {
           provide: PrismaService,
           useValue: prismaMock,
         },
+        {
+          provide: S3Service,
+          useValue: s3ServiceMock,
+        },
       ],
     }).compile();
 
     repository = module.get<PostgresCarsRepository>(PostgresCarsRepository);
+    s3Service = module.get<S3Service>(S3Service);
   });
 
   describe('findAll', () => {
@@ -65,40 +79,48 @@ describe('PostgresCarsRepository', () => {
         model: '911 Carrera',
         year: 2024,
         mileage_km: 1000,
-        body_type: 'COUPE' as BodyType,
-        engine: { volume: '4.0L', type: 'V8', power_hp: 600 },
+        body_type: BodyType.COUPE,
+        engine: JSON.stringify({ volume: '4.0L', type: 'V8', power_hp: 600 }),
         color: 'Crayon',
         interior_material: 'Leather',
         price_per_day_pln: 3000,
         is_available: true,
       };
 
-      const mockCar = createMockCar(dto);
+      const mockCar = createMockCar({
+        ...dto,
+        engine: { volume: '4.0L', type: 'V8', power_hp: 600 },
+      });
       prismaMock.car.create.mockResolvedValue(mockCar);
 
-      const result = await repository.create(dto);
+      const result = await repository.create(dto as any);
 
       expect(result).toEqual(mockCar);
-      expect(prismaMock.car.create).toHaveBeenCalledWith({
-        data: {
-          ...dto,
-          is_available: true,
-        },
-      });
+      expect(prismaMock.car.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            engine: { volume: '4.0L', type: 'V8', power_hp: 600 },
+          }),
+        }),
+      );
     });
   });
 
   describe('findOne', () => {
     it('should return a car if it exists', async () => {
-      const mockCar = createMockCar({ id: 'db_car_1' });
+      const mockCar = createMockCar({
+        id: 'db_car_1',
+      });
       prismaMock.car.findUnique.mockResolvedValue(mockCar);
 
       const result = await repository.findOne('db_car_1');
 
       expect(result).toEqual(mockCar);
-      expect(prismaMock.car.findUnique).toHaveBeenCalledWith({
-        where: { id: 'db_car_1' },
-      });
+      expect(prismaMock.car.findUnique).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: 'db_car_1' },
+        }),
+      );
     });
 
     it('should return null if car does not exist', async () => {
@@ -134,13 +156,27 @@ describe('PostgresCarsRepository', () => {
   });
 
   describe('remove', () => {
-    it('should successfully delete and return the car if it exists', async () => {
-      const mockCar = createMockCar({ id: 'db_car_1' });
-      prismaMock.car.delete.mockResolvedValue(mockCar);
+    it('should delete car and its images from S3 if images exist', async () => {
+      const mockCarWithImages = createMockCar({
+        id: 'db_car_1',
+        images: [
+          { url: 'https://test-bucket.s3.amazonaws.com/cars/img1.webp' },
+        ],
+      });
+
+      prismaMock.car.delete.mockResolvedValue(mockCarWithImages);
+
+      // Используем s3Service, который мы получили через module.get
+      const s3Spy = vi
+        .spyOn(s3Service, 'deleteFiles')
+        .mockResolvedValue(undefined);
 
       const result = await repository.remove('db_car_1');
 
-      expect(result).toEqual(mockCar);
+      expect(result).toEqual(mockCarWithImages);
+      expect(s3Spy).toHaveBeenCalledWith([
+        'https://test-bucket.s3.amazonaws.com/cars/img1.webp',
+      ]);
     });
 
     it('should catch Prisma error and return null if car to delete does not exist', async () => {

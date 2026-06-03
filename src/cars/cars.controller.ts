@@ -7,12 +7,20 @@ import {
   Param,
   Delete,
   Inject,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
 import { CarsService } from './cars.service';
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
-import { ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiConsumes,
+} from '@nestjs/swagger';
 import { CreateCarExample } from './constants/car-examples.mock';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('cars')
 export class CarsController {
@@ -37,8 +45,50 @@ export class CarsController {
     },
   })
   @Post()
-  create(@Body() createCarDto: CreateCarDto) {
-    return this.carsService.create(createCarDto);
+  @UseInterceptors(FilesInterceptor('images'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        brand: { type: 'string' },
+        model: { type: 'string' },
+        year: { type: 'integer' },
+        mileage_km: { type: 'integer' },
+        color: { type: 'string' },
+        interior_material: { type: 'string' },
+        price_per_day_pln: { type: 'number' },
+        is_available: { type: 'boolean' },
+        engine: {
+          type: 'string',
+          description:
+            'JSON string: {"type": "diesel", "volume": "3.0", "power_hp": 340}',
+        },
+        files: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+      },
+      required: [
+        'brand',
+        'model',
+        'year',
+        'mileage_km',
+        'color',
+        'interior_material',
+        'is_available',
+        'engine',
+      ],
+    },
+  })
+  create(
+    @Body() createCarDto: CreateCarDto,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    return this.carsService.create(createCarDto, files);
   }
 
   @ApiOperation({ summary: 'Fetch all available cars' })
@@ -84,5 +134,15 @@ export class CarsController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.carsService.remove(id);
+  }
+
+  @Delete()
+  removeAll() {
+    return this.carsService.removeAll();
+  }
+
+  @Post('/bulk')
+  createMany(@Body() createCarDtos: CreateCarDto[]) {
+    return this.carsService.createMany(createCarDtos);
   }
 }

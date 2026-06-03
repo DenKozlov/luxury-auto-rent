@@ -12,7 +12,6 @@ import {
   Mocked,
   afterEach,
 } from 'vitest';
-import { CreateCarDto } from './dto/create-car.dto.js';
 
 const mockDbCar = createMockCar();
 
@@ -75,10 +74,10 @@ describe('CarsService', () => {
   it('should add new car to the list', async () => {
     repositoryMock.create.mockResolvedValue(mockDbCar);
 
-    const result = await service.create(mockDbCar);
+    const result = await service.create(mockDbCar, []);
 
     expect(result).toEqual(mockDbCar);
-    expect(repositoryMock.create).toHaveBeenCalledWith(mockDbCar);
+    expect(repositoryMock.create).toHaveBeenCalledWith(mockDbCar, []);
   });
 
   it('should delete car if it exists', async () => {
