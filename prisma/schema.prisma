@@ -20,6 +20,14 @@ model Car {
   price_per_day_pln Int    
   is_available      Boolean  @default(true)
   createdAt         DateTime @default(now())
+  images            CarImage[]
+}
+
+model CarImage {
+  id                String @id @default(uuid())
+  url               String
+  carId             String
+  car               Car    @relation(fields: [carId], references: [id], onDelete: Cascade)
 }
 
 enum BodyType {

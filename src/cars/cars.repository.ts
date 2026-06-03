@@ -8,4 +8,5 @@ export abstract class CarsRepository {
   abstract remove(id: string): Promise<Car | null>;
   abstract update(id: string, updateCarDto: UpdateCarDto): Promise<Car | null>;
   abstract findOne(id: string): Promise<Car | null>;
+  abstract removeAll(): Promise<void>;
 }

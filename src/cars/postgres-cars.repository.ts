@@ -46,4 +46,7 @@ export class PostgresCarsRepository extends CarsRepository {
       return null;
     }
   }
+  removeAll(): Promise<void> {
+    return this.prisma.car.deleteAll() as Promise<void>;
+  }
 }

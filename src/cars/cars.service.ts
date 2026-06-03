@@ -40,4 +40,8 @@ export class CarsService {
     }
     return car;
   }
+
+  async removeAll() {
+    return await this.carsRepository.removeAll();
+  }
 }
