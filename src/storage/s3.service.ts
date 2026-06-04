@@ -20,11 +20,11 @@ export class S3Service {
       'AWS_SECRET_ACCESS_KEY',
     );
     this.bucketName = this.configService.get<string>('AWS_BUCKET_NAME');
-    this.bucketUrl = `https://${this.bucketName}.s3.${this.region}.amazonaws.com`;
 
-    if (!this.region || !accessKeyId || !secretAccessKey) {
+    if (!this.region || !accessKeyId || !secretAccessKey || !this.bucketName) {
       throw new Error('Missing AWS configuration in environment variables');
     }
+    this.bucketUrl = `https://${this.bucketName}.s3.${this.region}.amazonaws.com`;
 
     this.s3 = new S3Client({
       region: this.region,
@@ -43,15 +43,14 @@ export class S3Service {
       await this.s3.send(command);
       return `${this.bucketUrl}/${key}`;
     } catch (error) {
-      console.error('Error uploading file to S3:', error);
+      console.log('Error uploading file to S3:', error);
       throw new Error('Could not upload file');
     }
   }
 
   async deleteFiles(urls: string[]): Promise<void> {
-    const keys = urls.map((url) => {
-      return url.replace(this.bucketUrl ?? '', '');
-    });
+    const prefix = `${this.bucketUrl}/`;
+    const keys = urls.map((url) => url.replace(prefix, ''));
 
     const command = new DeleteObjectsCommand({
       Bucket: this.bucketName,
@@ -63,7 +62,7 @@ export class S3Service {
     try {
       await this.s3.send(command);
     } catch (error) {
-      console.error('Error deleting files from S3:', error);
+      console.log('Error deleting files from S3:', error);
       throw new Error('Could not delete car images');
     }
   }

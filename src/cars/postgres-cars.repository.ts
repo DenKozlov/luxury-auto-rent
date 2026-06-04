@@ -31,6 +31,7 @@ export class PostgresCarsRepository extends CarsRepository {
   }
 
   async create(dto: CreateCarDto, files?: Express.Multer.File[]): Promise<Car> {
+    let urls: string[] = [];
     const carData = instanceToPlain(dto) as Prisma.CarCreateInput;
     const validCar = {
       ...carData,
@@ -40,41 +41,40 @@ export class PostgresCarsRepository extends CarsRepository {
       is_available: Boolean(carData.is_available),
       engine: JSON.parse(carData.engine as string),
     };
+    const hasFiles = files && files.length > 0;
 
-    return await this.prisma.$transaction(async (tx) => {
-      let car;
-      try {
-        car = await tx.car.create({
-          data: validCar,
-        });
-      } catch (e) {
-        console.error('Car creation failed:', e);
-        throw new BadRequestException('Car creation failed');
+    if (hasFiles) {
+      const uploadPromises = files.map((file) =>
+        this.s3Service.uploadFile(
+          file,
+          `cars/${Date.now()}-${file.originalname}`,
+        ),
+      );
+
+      urls = await Promise.all(uploadPromises);
+    }
+
+    try {
+      return await this.prisma.$transaction(async (tx) => {
+        const car = await tx.car.create({ data: validCar });
+
+        if (hasFiles) {
+          return (await tx.car.update({
+            where: { id: car.id },
+            data: { images: { create: urls.map((url) => ({ url })) } },
+            include: { images: { select: { id: true, url: true } } },
+          })) as Car;
+        }
+        return car as Car;
+      });
+    } catch (e) {
+      if (urls.length > 0) {
+        await this.s3Service
+          .deleteFiles(urls)
+          .catch((err) => console.log('Failed to rollback S3 files:', err));
       }
-
-      if (files) {
-        const uploadPromises = files.map((file) =>
-          this.s3Service.uploadFile(
-            file,
-            `cars/${Date.now()}-${file.originalname}`,
-          ),
-        );
-
-        const urls = await Promise.all(uploadPromises);
-
-        return (await tx.car.update({
-          where: { id: car.id },
-          data: {
-            images: {
-              create: urls.map((url) => ({ url })),
-            },
-          },
-          include: { images: { select: { id: true, url: true } } },
-        })) as Car;
-      }
-
-      return car as Car;
-    });
+      throw new BadRequestException('Car creation failed');
+    }
   }
 
   findOne(id: string): Promise<Car | null> {
@@ -92,54 +92,40 @@ export class PostgresCarsRepository extends CarsRepository {
   }
 
   async update(id: string, updateCarDto: UpdateCarDto): Promise<Car | null> {
-    const carData = instanceToPlain(updateCarDto);
-    const { deletedImagesIds, ...restData } = carData;
+    const { deletedImagesIds, ...restData } = instanceToPlain(updateCarDto);
+
     try {
-      if (deletedImagesIds?.length) {
-        const imagesToDelete = await this.prisma.carImage.findMany({
-          where: { id: { in: deletedImagesIds }, carId: id },
-          select: { url: true },
-        });
+      let imagesToDelete: { url: string }[] = [];
 
-        if (imagesToDelete.length > 0) {
-          const urls = imagesToDelete.map((img) => img.url);
-          await this.s3Service.deleteFiles(urls);
-        }
-      }
-
-      return await this.prisma.$transaction(async (tx) => {
-        let updatedCar;
+      const updatedCar = await this.prisma.$transaction(async (tx) => {
         if (deletedImagesIds?.length) {
+          imagesToDelete = await tx.carImage.findMany({
+            where: { id: { in: deletedImagesIds }, carId: id },
+            select: { url: true },
+          });
+
           await tx.carImage.deleteMany({
             where: { id: { in: deletedImagesIds }, carId: id },
           });
         }
-        const keys = Object.keys(restData);
-        if (keys.length > 0) {
-          updatedCar = await tx.car.update({
-            where: { id },
-            data: carData,
-            include: {
-              images: {
-                select: { id: true, url: true },
-              },
-            },
-          });
-        } else {
-          updatedCar = await tx.car.findUnique({
-            where: { id },
-            include: {
-              images: {
-                select: { id: true, url: true },
-              },
-            },
-          });
-        }
 
-        return updatedCar as Car;
+        return await tx.car.update({
+          where: { id },
+          data: restData,
+          include: { images: { select: { id: true, url: true } } },
+        });
       });
+
+      if (imagesToDelete.length > 0) {
+        const urls = imagesToDelete.map((img) => img.url);
+        await this.s3Service.deleteFiles(urls).catch((err) => {
+          console.log('S3 deletion failed after DB commit', err);
+        });
+      }
+
+      return updatedCar as Car;
     } catch (e) {
-      console.error('Car update failed:', e);
+      console.log('Car update failed:', e);
       return null;
     }
   }
@@ -158,7 +144,7 @@ export class PostgresCarsRepository extends CarsRepository {
 
       return deletedCar as Car;
     } catch (e) {
-      console.error('Car delition failed:', e);
+      console.log('Car delition failed:', e);
       return null;
     }
   }

@@ -28,6 +28,8 @@ model CarImage {
   url               String
   carId             String
   car               Car    @relation(fields: [carId], references: [id], onDelete: Cascade)
+
+  @@index([carId])
 }
 
 enum BodyType {

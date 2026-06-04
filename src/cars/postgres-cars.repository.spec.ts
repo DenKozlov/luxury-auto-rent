@@ -23,6 +23,7 @@ describe('PostgresCarsRepository', () => {
   let repository: PostgresCarsRepository;
   let prismaMock: any;
   let s3Service: S3Service;
+  vi.spyOn(console, 'log').mockImplementation(() => {});
 
   beforeEach(async () => {
     prismaMock = {

@@ -7,11 +7,12 @@ import {
   DeleteObjectsCommand,
 } from '@aws-sdk/client-s3';
 import { mockClient } from 'aws-sdk-client-mock';
-import { describe, beforeEach, it, expect } from 'vitest';
+import { describe, beforeEach, it, expect, vi } from 'vitest';
 
 describe('S3Service', () => {
   let service: S3Service;
   const s3Mock = mockClient(S3Client);
+  vi.spyOn(console, 'log').mockImplementation(() => {});
 
   beforeEach(async () => {
     s3Mock.reset();
