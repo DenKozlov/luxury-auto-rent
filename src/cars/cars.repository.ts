@@ -9,7 +9,10 @@ export abstract class CarsRepository {
     dto: CreateCarDto,
     tx: Prisma.TransactionClient,
   ): Promise<Car>;
-  abstract remove(id: string): Promise<Car | null>;
+  abstract remove(
+    id: string,
+    tx: Prisma.TransactionClient,
+  ): Promise<Car | null>;
   abstract update(id: string, updateCarDto: UpdateCarDto): Promise<Car | null>;
   abstract findOne(id: string): Promise<Car | null>;
   abstract removeAll(): Promise<void>;

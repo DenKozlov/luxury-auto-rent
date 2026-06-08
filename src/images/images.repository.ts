@@ -7,5 +7,8 @@ export abstract class ImagesRepository {
     files: Express.Multer.File[],
     tx: Prisma.TransactionClient,
   ): Promise<void>;
-  // abstract removeImages(id: string): Promise<Image | null>;
+  abstract deleteImages(
+    carId: string,
+    tx: Prisma.TransactionClient,
+  ): Promise<void>;
 }

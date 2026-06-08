@@ -104,17 +104,12 @@ export class PostgresCarsRepository extends CarsRepository {
     }
   }
 
-  async remove(id: string): Promise<Car | null> {
+  async remove(id: string, tx: Prisma.TransactionClient): Promise<Car | null> {
     try {
-      const deletedCar = await this.prisma.car.delete({
+      const deletedCar = await tx.car.delete({
         where: { id },
         include: { images: true },
       });
-
-      // if (deletedCar?.images?.length > 0) {
-      //   const urls = deletedCar.images.map((i) => i.url);
-      //   await this.s3Service.deleteFiles(urls);
-      // }
 
       return deletedCar as Car;
     } catch (e) {

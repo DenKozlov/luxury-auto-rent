@@ -45,11 +45,16 @@ export class CarsService {
   }
 
   async remove(id: string) {
-    const car = await this.carsRepository.remove(id);
-    if (!car) {
-      throw new NotFoundException(`Car with ID ${id} not found`);
-    }
-    return car;
+    return await this.prisma.$transaction(async (tx) => {
+      const car = await this.carsRepository.remove(id, tx);
+      if (!car) {
+        throw new NotFoundException(`Car with ID ${id} not found`);
+      }
+      if (car?.images?.length > 0) {
+        await this.postgresImagesRepository.deleteImages(id, tx);
+      }
+      return car;
+    });
   }
   // v8 ignore start
   async removeAll() {

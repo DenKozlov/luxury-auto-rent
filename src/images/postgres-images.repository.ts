@@ -33,4 +33,17 @@ export class PostgresImagesRepository extends ImagesRepository {
       data: imagesData,
     });
   }
+  async deleteImages(
+    carId: string,
+    tx: Prisma.TransactionClient,
+  ): Promise<void> {
+    const images = await tx.carImage.findMany({ where: { carId } });
+    const urls = images.map((img) => img.url);
+
+    if (urls.length > 0) {
+      await this.s3Service.deleteFiles(urls);
+    }
+
+    await tx.carImage.deleteMany({ where: { carId } });
+  }
 }
