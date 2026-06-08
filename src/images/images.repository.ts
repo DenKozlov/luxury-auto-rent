@@ -1,8 +1,11 @@
-import { AddImageDto } from './dto/add-image.dto';
-import { Image } from './image.interface';
+import { Prisma } from '../../prisma/generated/client';
 
 export abstract class ImagesRepository {
   //   abstract findAll(): Promise<Car[]>;
-  abstract create(dto: AddImageDto): Promise<Image>;
-  abstract remove(id: string): Promise<Image | null>;
+  abstract createImages(
+    carId: string,
+    files: Express.Multer.File[],
+    tx: Prisma.TransactionClient,
+  ): Promise<void>;
+  // abstract removeImages(id: string): Promise<Image | null>;
 }

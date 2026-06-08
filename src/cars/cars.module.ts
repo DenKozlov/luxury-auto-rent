@@ -2,17 +2,23 @@ import { Module } from '@nestjs/common';
 import { CarsService } from './cars.service';
 import { CarsController } from './cars.controller';
 import { CarsRepository } from './cars.repository';
-import { PrismaService } from '../../prisma.service';
 import { PostgresCarsRepository } from './postgres-cars.repository';
+import { ImagesRepository } from '../images/images.repository';
+import { PostgresImagesRepository } from '../images/postgres-images.repository';
+import { ImagesModule } from 'src/images/images.module';
 
 @Module({
+  imports: [ImagesModule],
   controllers: [CarsController],
   providers: [
     CarsService,
-    PrismaService,
     {
       provide: CarsRepository,
       useClass: PostgresCarsRepository,
+    },
+    {
+      provide: ImagesRepository,
+      useExisting: PostgresImagesRepository,
     },
   ],
 })

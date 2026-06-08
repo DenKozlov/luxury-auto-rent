@@ -1,7 +1,6 @@
 import { Inject, Injectable, BadRequestException } from '@nestjs/common';
 import { CarsRepository } from './cars.repository';
 import { PrismaService } from '../../prisma.service';
-import { S3Service } from '../storage/s3.service';
 import { CreateCarDto } from './dto/create-car.dto';
 import { Car } from './car.interface';
 import { UpdateCarDto } from './dto/update-car.dto';
@@ -10,10 +9,7 @@ import { Prisma } from '../../prisma/generated/client';
 
 @Injectable()
 export class PostgresCarsRepository extends CarsRepository {
-  constructor(
-    @Inject(PrismaService) private readonly prisma: PrismaService,
-    @Inject(S3Service) private readonly s3Service: S3Service,
-  ) {
+  constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {
     super();
   }
 
@@ -30,8 +26,7 @@ export class PostgresCarsRepository extends CarsRepository {
     }) as Promise<Car[]>;
   }
 
-  async create(dto: CreateCarDto, files?: Express.Multer.File[]): Promise<Car> {
-    let urls: string[] = [];
+  async create(dto: CreateCarDto, tx: Prisma.TransactionClient): Promise<Car> {
     const carData = instanceToPlain(dto) as Prisma.CarCreateInput;
     const validCar = {
       ...carData,
@@ -41,38 +36,17 @@ export class PostgresCarsRepository extends CarsRepository {
       is_available: Boolean(carData.is_available),
       engine: JSON.parse(carData.engine as string),
     };
-    const hasFiles = files && files.length > 0;
-
-    if (hasFiles) {
-      const uploadPromises = files.map((file) =>
-        this.s3Service.uploadFile(
-          file,
-          `cars/${Date.now()}-${file.originalname}`,
-        ),
-      );
-
-      urls = await Promise.all(uploadPromises);
-    }
 
     try {
-      return await this.prisma.$transaction(async (tx) => {
-        const car = await tx.car.create({ data: validCar });
-
-        if (hasFiles) {
-          return (await tx.car.update({
-            where: { id: car.id },
-            data: { images: { create: urls.map((url) => ({ url })) } },
-            include: { images: { select: { id: true, url: true } } },
-          })) as Car;
-        }
-        return car as Car;
-      });
+      const car = await tx.car.create({ data: validCar });
+      return car as Car;
     } catch (e) {
-      if (urls.length > 0) {
-        await this.s3Service
-          .deleteFiles(urls)
-          .catch((err) => console.log('Failed to rollback S3 files:', err));
-      }
+      console.log(e);
+      // if (urls.length > 0) {
+      //   await this.s3Service
+      //     .deleteFiles(urls)
+      //     .catch((err) => console.log('Failed to rollback S3 files:', err));
+      // }
       throw new BadRequestException('Car creation failed');
     }
   }
@@ -116,12 +90,12 @@ export class PostgresCarsRepository extends CarsRepository {
         });
       });
 
-      if (imagesToDelete.length > 0) {
-        const urls = imagesToDelete.map((img) => img.url);
-        await this.s3Service.deleteFiles(urls).catch((err) => {
-          console.log('S3 deletion failed after DB commit', err);
-        });
-      }
+      // if (imagesToDelete.length > 0) {
+      //   const urls = imagesToDelete.map((img) => img.url);
+      //   await this.s3Service.deleteFiles(urls).catch((err) => {
+      //     console.log('S3 deletion failed after DB commit', err);
+      //   });
+      // }
 
       return updatedCar as Car;
     } catch (e) {
@@ -137,10 +111,10 @@ export class PostgresCarsRepository extends CarsRepository {
         include: { images: true },
       });
 
-      if (deletedCar?.images?.length > 0) {
-        const urls = deletedCar.images.map((i) => i.url);
-        await this.s3Service.deleteFiles(urls);
-      }
+      // if (deletedCar?.images?.length > 0) {
+      //   const urls = deletedCar.images.map((i) => i.url);
+      //   await this.s3Service.deleteFiles(urls);
+      // }
 
       return deletedCar as Car;
     } catch (e) {
