@@ -121,8 +121,13 @@ export class CarsController {
     type: CreateCarDto,
   })
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCarDto: UpdateCarDto) {
-    return this.carsService.update(id, updateCarDto);
+  @UseInterceptors(FilesInterceptor('images'))
+  update(
+    @Param('id') id: string,
+    @Body() updateCarDto: UpdateCarDto,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    return this.carsService.update(id, updateCarDto, files);
   }
 
   @ApiOperation({ summary: 'Delete car by id' })

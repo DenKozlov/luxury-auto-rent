@@ -1,4 +1,9 @@
-import { Inject, Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CarsRepository } from './cars.repository';
 import { PrismaService } from '../../prisma.service';
 import { CreateCarDto } from './dto/create-car.dto';
@@ -15,6 +20,9 @@ export class PostgresCarsRepository extends CarsRepository {
 
   findAll(): Promise<Car[]> {
     return this.prisma.car.findMany({
+      orderBy: {
+        brand: 'asc',
+      },
       include: {
         images: {
           select: {
@@ -42,17 +50,14 @@ export class PostgresCarsRepository extends CarsRepository {
       return car as Car;
     } catch (e) {
       console.log(e);
-      // if (urls.length > 0) {
-      //   await this.s3Service
-      //     .deleteFiles(urls)
-      //     .catch((err) => console.log('Failed to rollback S3 files:', err));
-      // }
       throw new BadRequestException('Car creation failed');
     }
   }
 
-  findOne(id: string): Promise<Car | null> {
-    return this.prisma.car.findUnique({
+  findOne(id: string, tx?: Prisma.TransactionClient): Promise<Car | null> {
+    const prisma = tx || this.prisma;
+
+    return prisma.car.findUnique({
       where: { id },
       include: {
         images: {
@@ -65,39 +70,47 @@ export class PostgresCarsRepository extends CarsRepository {
     }) as Promise<Car | null>;
   }
 
-  async update(id: string, updateCarDto: UpdateCarDto): Promise<Car | null> {
-    const { deletedImagesIds, ...restData } = instanceToPlain(updateCarDto);
-
-    try {
-      let imagesToDelete: { url: string }[] = [];
-
-      const updatedCar = await this.prisma.$transaction(async (tx) => {
-        if (deletedImagesIds?.length) {
-          imagesToDelete = await tx.carImage.findMany({
-            where: { id: { in: deletedImagesIds }, carId: id },
-            select: { url: true },
-          });
-
-          await tx.carImage.deleteMany({
-            where: { id: { in: deletedImagesIds }, carId: id },
-          });
-        }
-
-        return await tx.car.update({
-          where: { id },
-          data: restData,
-          include: { images: { select: { id: true, url: true } } },
-        });
+  async update(
+    id: string,
+    updateCarDto: UpdateCarDto,
+    tx: Prisma.TransactionClient,
+  ): Promise<Car | null> {
+    const carData = instanceToPlain(updateCarDto) as Prisma.CarCreateInput;
+    let newEngineData;
+    if (carData.engine) {
+      const existingCar = await tx.car.findUnique({
+        where: { id },
+        select: { engine: true },
       });
 
-      // if (imagesToDelete.length > 0) {
-      //   const urls = imagesToDelete.map((img) => img.url);
-      //   await this.s3Service.deleteFiles(urls).catch((err) => {
-      //     console.log('S3 deletion failed after DB commit', err);
-      //   });
-      // }
+      if (!existingCar) {
+        throw new NotFoundException(`Car with ID ${id} not found`);
+      }
 
-      return updatedCar as Car;
+      newEngineData = {
+        ...(existingCar?.engine as Record<string, string | number>),
+        ...JSON.parse(carData.engine as string),
+      };
+    }
+
+    const validCar = {
+      ...carData,
+      ...(carData.year && { year: Number(carData.year) }),
+      ...(carData.mileage_km && { mileage_km: Number(carData.mileage_km) }),
+      ...(carData.price_per_day_pln && {
+        price_per_day_pln: Number(carData.price_per_day_pln),
+      }),
+      ...(carData.is_available && {
+        is_available: Boolean(carData.is_available),
+      }),
+      ...(carData.engine && { engine: newEngineData }),
+    };
+    try {
+      return (await tx.car.update({
+        where: { id },
+        data: validCar,
+        include: { images: { select: { id: true, url: true } } },
+      })) as Car;
     } catch (e) {
       console.log('Car update failed:', e);
       return null;

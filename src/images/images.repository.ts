@@ -1,7 +1,6 @@
 import { Prisma } from '../../prisma/generated/client';
 
 export abstract class ImagesRepository {
-  //   abstract findAll(): Promise<Car[]>;
   abstract createImages(
     carId: string,
     files: Express.Multer.File[],
@@ -10,5 +9,6 @@ export abstract class ImagesRepository {
   abstract deleteImages(
     carId: string,
     tx: Prisma.TransactionClient,
+    imagesIds?: string[],
   ): Promise<void>;
 }

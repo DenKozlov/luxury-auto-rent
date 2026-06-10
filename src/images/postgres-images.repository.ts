@@ -29,21 +29,41 @@ export class PostgresImagesRepository extends ImagesRepository {
       carId: carId,
     }));
 
-    await tx.carImage.createMany({
-      data: imagesData,
-    });
+    await tx.carImage
+      .createMany({
+        data: imagesData,
+      })
+      .catch((err) => {
+        console.log('S3 deletion failed after DB commit', err);
+      });
   }
   async deleteImages(
     carId: string,
     tx: Prisma.TransactionClient,
+    imagesIds?: string[],
   ): Promise<void> {
-    const images = await tx.carImage.findMany({ where: { carId } });
-    const urls = images.map((img) => img.url);
+    let imagesToDelete: { url: string }[] = [];
 
-    if (urls.length > 0) {
-      await this.s3Service.deleteFiles(urls);
+    if (imagesIds) {
+      imagesToDelete = await tx.carImage.findMany({
+        where: { id: { in: imagesIds }, carId },
+        select: { url: true },
+      });
+
+      await tx.carImage.deleteMany({
+        where: { id: { in: imagesIds }, carId },
+      });
+    } else {
+      imagesToDelete = await tx.carImage.findMany({
+        where: { carId },
+        select: { url: true },
+      });
+      await tx.carImage.deleteMany({ where: { carId } });
     }
 
-    await tx.carImage.deleteMany({ where: { carId } });
+    const urls = imagesToDelete.map((img) => img.url);
+    await this.s3Service.deleteFiles(urls).catch((err) => {
+      console.log('S3 deletion failed after DB commit', err);
+    });
   }
 }

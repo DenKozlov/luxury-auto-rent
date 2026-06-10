@@ -1,4 +1,10 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  NotFoundException,
+  InternalServerErrorException,
+  BadRequestException,
+} from '@nestjs/common';
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
 import { CarsRepository } from './cars.repository';
@@ -17,6 +23,9 @@ export class CarsService {
   async create(createCarDto: CreateCarDto, files?: Express.Multer.File[]) {
     return await this.prisma.$transaction(async (tx) => {
       const { id } = await this.carsRepository.create(createCarDto, tx);
+      if (!id) {
+        throw new InternalServerErrorException('Car creation failed');
+      }
       if (files && files.length > 0) {
         await this.postgresImagesRepository.createImages(id, files, tx);
       }
@@ -36,12 +45,28 @@ export class CarsService {
     return car;
   }
 
-  async update(id: string, updateCarDto: UpdateCarDto) {
-    const car = await this.carsRepository.update(id, updateCarDto);
-    if (!car) {
-      throw new NotFoundException(`Car with ID ${id} not found`);
-    }
-    return car;
+  async update(
+    id: string,
+    updateCarDto: UpdateCarDto,
+    files?: Express.Multer.File[],
+  ) {
+    return await this.prisma.$transaction(async (tx) => {
+      const { deletedImagesIds, ...restData } = updateCarDto;
+      const car = await this.carsRepository.update(id, restData, tx);
+      if (!car) {
+        throw new BadRequestException(
+          'Failed to update car due to database conflict or invalid data',
+        );
+      }
+      if (deletedImagesIds && deletedImagesIds.length > 0) {
+        await this.postgresImagesRepository.deleteImages(id, tx);
+      }
+      if (files && files.length > 0) {
+        await this.postgresImagesRepository.createImages(id, files, tx);
+      }
+
+      return this.carsRepository.findOne(id, tx);
+    });
   }
 
   async remove(id: string) {

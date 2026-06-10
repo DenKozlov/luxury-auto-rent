@@ -13,8 +13,15 @@ export abstract class CarsRepository {
     id: string,
     tx: Prisma.TransactionClient,
   ): Promise<Car | null>;
-  abstract update(id: string, updateCarDto: UpdateCarDto): Promise<Car | null>;
-  abstract findOne(id: string): Promise<Car | null>;
+  abstract update(
+    id: string,
+    carData: UpdateCarDto,
+    tx: Prisma.TransactionClient,
+  ): Promise<Car | null>;
+  abstract findOne(
+    id: string,
+    tx?: Prisma.TransactionClient,
+  ): Promise<Car | null>;
   abstract removeAll(): Promise<void>;
   abstract createMany(dtos: CreateCarDto[]): Promise<number>;
 }
