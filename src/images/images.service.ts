@@ -1,18 +1,43 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '../../prisma/generated/client';
 import { ImagesRepository } from './images.repository';
+import { S3Service } from '../storage/s3.service';
 
 @Injectable()
 export class ImagesService {
-  constructor(private readonly imagesRepository: ImagesRepository) {}
+  constructor(
+    private readonly imagesRepository: ImagesRepository,
+    private readonly s3Service: S3Service,
+  ) {}
   async createImages(
     carId: string,
     files: Express.Multer.File[],
     tx: Prisma.TransactionClient,
   ) {
-    return await this.imagesRepository.createImages(carId, files, tx);
+    let urls: string[] = [];
+    const uploadPromises = files.map((file) =>
+      this.s3Service.uploadFile(
+        file,
+        `cars/${Date.now()}-${file.originalname}`,
+      ),
+    );
+
+    urls = await Promise.all(uploadPromises);
+    const imagesData = urls.map((path) => ({
+      url: path,
+      carId: carId,
+    }));
+    return await this.imagesRepository.createImages(imagesData, tx);
   }
-  async deleteImages(carId: string, tx: Prisma.TransactionClient) {
-    return await this.imagesRepository.deleteImages(carId, tx);
+  async deleteImages(
+    carId: string,
+    tx: Prisma.TransactionClient,
+    deletedImagesIds?: string[],
+  ) {
+    return await this.imagesRepository.deleteImages(
+      carId,
+      tx,
+      deletedImagesIds,
+    );
   }
 }

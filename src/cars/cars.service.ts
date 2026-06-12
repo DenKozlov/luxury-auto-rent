@@ -9,14 +9,14 @@ import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
 import { CarsRepository } from './cars.repository';
 import { PrismaService } from '../../prisma.service';
-import { PostgresImagesRepository } from '../images/postgres-images.repository';
+import { ImagesService } from '../images/images.service';
 
 @Injectable()
 export class CarsService {
   constructor(
     @Inject(CarsRepository) private readonly carsRepository: CarsRepository,
-    @Inject(PostgresImagesRepository)
-    private readonly postgresImagesRepository: PostgresImagesRepository,
+    @Inject(ImagesService)
+    private readonly imagesService: ImagesService,
     @Inject(PrismaService) private readonly prisma: PrismaService,
   ) {}
 
@@ -27,7 +27,7 @@ export class CarsService {
         throw new InternalServerErrorException('Car creation failed');
       }
       if (files && files.length > 0) {
-        await this.postgresImagesRepository.createImages(id, files, tx);
+        await this.imagesService.createImages(id, files, tx);
       }
       return this.carsRepository.findOne(id);
     });
@@ -59,10 +59,10 @@ export class CarsService {
         );
       }
       if (deletedImagesIds && deletedImagesIds.length > 0) {
-        await this.postgresImagesRepository.deleteImages(id, tx);
+        await this.imagesService.deleteImages(id, tx, deletedImagesIds);
       }
       if (files && files.length > 0) {
-        await this.postgresImagesRepository.createImages(id, files, tx);
+        await this.imagesService.createImages(id, files, tx);
       }
 
       return this.carsRepository.findOne(id, tx);
@@ -76,7 +76,7 @@ export class CarsService {
         throw new NotFoundException(`Car with ID ${id} not found`);
       }
       if (car?.images?.length > 0) {
-        await this.postgresImagesRepository.deleteImages(id, tx);
+        await this.imagesService.deleteImages(id, tx);
       }
       return car;
     });

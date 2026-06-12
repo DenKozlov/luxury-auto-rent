@@ -1,7 +1,6 @@
 import { BodyType } from '../../prisma/generated/client';
 
 export const createMockCar = (overrides = {}) => ({
-  id: 'car_004',
   brand: 'Audi',
   model: 'RS6 Avant',
   year: 2023,
@@ -12,6 +11,12 @@ export const createMockCar = (overrides = {}) => ({
   interior_material: 'Valcona Leather',
   price_per_day_pln: 1900,
   is_available: false,
-  createdAt: new Date(),
   ...overrides,
+});
+
+export const createMockCarWithImages = (images: [{ url: string }]) => ({
+  ...createMockCar(),
+  images: {
+    create: images,
+  },
 });

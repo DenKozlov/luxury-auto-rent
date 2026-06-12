@@ -10,32 +10,15 @@ export class PostgresImagesRepository extends ImagesRepository {
   }
 
   async createImages(
-    carId: string,
-    files: Express.Multer.File[],
+    imagesData: {
+      url: string;
+      carId: string;
+    }[],
     tx: Prisma.TransactionClient,
   ): Promise<void> {
-    let urls: string[] = [];
-    const uploadPromises = files.map((file) =>
-      this.s3Service.uploadFile(
-        file,
-        `cars/${Date.now()}-${file.originalname}`,
-      ),
-    );
-
-    urls = await Promise.all(uploadPromises);
-
-    const imagesData = urls.map((path) => ({
-      url: path,
-      carId: carId,
-    }));
-
-    await tx.carImage
-      .createMany({
-        data: imagesData,
-      })
-      .catch((err) => {
-        console.log('S3 deletion failed after DB commit', err);
-      });
+    await tx.carImage.createMany({
+      data: imagesData,
+    });
   }
   async deleteImages(
     carId: string,
@@ -62,8 +45,6 @@ export class PostgresImagesRepository extends ImagesRepository {
     }
 
     const urls = imagesToDelete.map((img) => img.url);
-    await this.s3Service.deleteFiles(urls).catch((err) => {
-      console.log('S3 deletion failed after DB commit', err);
-    });
+    await this.s3Service.deleteFiles(urls);
   }
 }

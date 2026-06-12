@@ -2,8 +2,10 @@ import { Prisma } from '../../prisma/generated/client';
 
 export abstract class ImagesRepository {
   abstract createImages(
-    carId: string,
-    files: Express.Multer.File[],
+    imagesData: {
+      url: string;
+      carId: string;
+    }[],
     tx: Prisma.TransactionClient,
   ): Promise<void>;
   abstract deleteImages(
