@@ -4,6 +4,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 
 @Injectable()
 export class PrismaService extends PrismaClient {
+  // v8 ignore start
   constructor() {
     if (!process.env.DATABASE_URL) {
       throw new Error('DATABASE_URL environment variable is not defined');
@@ -13,4 +14,5 @@ export class PrismaService extends PrismaClient {
     });
     super({ adapter });
   }
+  // v8 ignore end
 }

@@ -1,11 +1,14 @@
 import { defineConfig } from 'vitest/config';
-import path from 'path';
+import dotenv from 'dotenv';
+
+dotenv.config({ path: '.env.test' });
 
 export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
     coverage: {
+      exclude: ['**/prisma/generated/**', '**/dto/**', '**/*.stub.ts'],
       enabled: true,
       reporter: ['text'],
       thresholds: {
@@ -16,14 +19,6 @@ export default defineConfig({
           statements: 60,
         },
       },
-    },
-  },
-  resolve: {
-    alias: {
-      './prisma/generated/client': path.resolve(
-        __dirname,
-        './test/prisma-stub.ts',
-      ),
     },
   },
 });

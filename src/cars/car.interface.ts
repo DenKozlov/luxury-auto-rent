@@ -3,8 +3,15 @@ interface EngineInterface {
   volume: string;
   type: string;
 }
-import { Car as PrismaCar } from '@prisma/client';
+import { Prisma } from '../../prisma/generated/client';
 
-export interface Car extends Omit<PrismaCar, 'engine'> {
+// export interface Car extends Omit<PrismaCar, 'engine'> {
+//   engine: EngineInterface | null;
+// }
+
+export type Car = Omit<
+  Prisma.CarGetPayload<{ include: { images: true } }>,
+  'engine'
+> & {
   engine: EngineInterface | null;
-}
+};

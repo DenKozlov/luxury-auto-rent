@@ -22,3 +22,8 @@ export * from './enums';
  * 
  */
 export type Car = Prisma.CarModel
+/**
+ * Model CarImage
+ * 
+ */
+export type CarImage = Prisma.CarImageModel
