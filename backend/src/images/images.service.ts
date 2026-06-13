@@ -1,21 +1,43 @@
 import { Injectable } from '@nestjs/common';
-// import { PrismaService } from '../prisma/prisma.service';
-// import { AddImageDto } from './dto/add-image.dto';
+import { Prisma } from '../../prisma/generated/client';
+import { ImagesRepository } from './images.repository';
+import { S3Service } from '../storage/s3.service';
 
 @Injectable()
 export class ImagesService {
-  //   constructor(private prisma: PrismaService) {}
-  //   async addImages(dto: AddImageDto) {
-  //     return await this.prisma.carImage.create({
-  //       data: {
-  //         url: dto.url,
-  //         carId: dto.carId,
-  //       },
-  //     });
-  //   }
-  //   async getImagesByCarId(carId: string) {
-  //     return await this.prisma.carImage.findMany({
-  //       where: { carId },
-  //     });
-  //   }
+  constructor(
+    private readonly imagesRepository: ImagesRepository,
+    private readonly s3Service: S3Service,
+  ) {}
+  async createImages(
+    carId: string,
+    files: Express.Multer.File[],
+    tx: Prisma.TransactionClient,
+  ) {
+    let urls: string[] = [];
+    const uploadPromises = files.map((file) =>
+      this.s3Service.uploadFile(
+        file,
+        `cars/${Date.now()}-${file.originalname}`,
+      ),
+    );
+
+    urls = await Promise.all(uploadPromises);
+    const imagesData = urls.map((path) => ({
+      url: path,
+      carId: carId,
+    }));
+    return await this.imagesRepository.createImages(imagesData, tx);
+  }
+  async deleteImages(
+    carId: string,
+    tx: Prisma.TransactionClient,
+    deletedImagesIds?: string[],
+  ) {
+    return await this.imagesRepository.deleteImages(
+      carId,
+      tx,
+      deletedImagesIds,
+    );
+  }
 }
