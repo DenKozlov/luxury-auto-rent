@@ -87,6 +87,10 @@ export class CarsService {
     return await this.carsRepository.getFilters();
   }
 
+  async getRecommended() {
+    return await this.carsRepository.getRecommended();
+  }
+
   // v8 ignore start
   async removeAll() {
     return await this.carsRepository.removeAll();

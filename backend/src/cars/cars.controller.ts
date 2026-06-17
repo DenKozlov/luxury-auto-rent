@@ -12,6 +12,8 @@ import {
   Query,
   ParseIntPipe,
   ParseUUIDPipe,
+  ParseBoolPipe,
+  ParseArrayPipe,
 } from '@nestjs/common';
 import { CarsService } from './cars.service';
 import { CreateCarDto } from './dto/create-car.dto';
@@ -24,6 +26,7 @@ import {
 } from '@nestjs/swagger';
 import { CreateCarExample } from './constants/car-examples.mock';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { BodyType } from 'prisma/generated/enums';
 
 @Controller('cars')
 export class CarsController {
@@ -105,8 +108,27 @@ export class CarsController {
   async findAll(
     @Query('page', ParseIntPipe) page: number,
     @Query('limit', ParseIntPipe) limit: number,
+    @Query('brands[]', new ParseArrayPipe({ optional: true }))
+    brands?: string[],
+    @Query('bodyTypes[]', new ParseArrayPipe({ optional: true }))
+    bodyTypes?: BodyType[],
+    @Query(
+      'priceRange[]',
+      new ParseArrayPipe({ items: Number, optional: true }),
+    )
+    priceRange?: [number, number],
+    @Query('isAvailable', new ParseBoolPipe({ optional: true }))
+    isAvailable?: boolean,
   ) {
-    return this.carsService.findAll({ page, limit });
+    const query = {
+      page,
+      limit,
+      isAvailable,
+      bodyTypes,
+      brands,
+      priceRange,
+    };
+    return this.carsService.findAll(query);
   }
 
   @ApiOperation({ summary: 'Fetch car by id' })
@@ -160,5 +182,10 @@ export class CarsController {
   @Get('/filters')
   async getFilters() {
     return await this.carsService.getFilters();
+  }
+
+  @Get('/recommended')
+  async getRecommended() {
+    return await this.carsService.getRecommended();
   }
 }

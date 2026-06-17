@@ -15,8 +15,18 @@ export const carService = {
   },
 
   getFilters: async (): Promise<Filters> => {
-    const { data } = await api.get("/cars/filters");
+    const { data } = await api.get<Filters>("/cars/filters");
 
+    return data;
+  },
+
+  getById: async (id: string): Promise<Car> => {
+    const { data } = await api.get<Car>(`/cars/details/${id}`);
+    return data;
+  },
+
+  getTopRated: async (): Promise<Car[]> => {
+    const { data } = await api.get<Car[]>("/cars/recommended");
     return data;
   },
 };

@@ -604,7 +604,8 @@ export const CarScalarFieldEnum = {
   interior_material: 'interior_material',
   price_per_day_pln: 'price_per_day_pln',
   is_available: 'is_available',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  rating: 'rating'
 } as const
 
 export type CarScalarFieldEnum = (typeof CarScalarFieldEnum)[keyof typeof CarScalarFieldEnum]

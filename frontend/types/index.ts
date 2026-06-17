@@ -26,6 +26,7 @@ export interface Car {
   is_available: boolean;
   createdAt: string;
   images: Image[];
+  rating: number;
 }
 
 export interface GetCarsParams {
@@ -35,13 +36,20 @@ export interface GetCarsParams {
 
 export interface CarsReponse {
   data: Car[];
+  hasMore: boolean;
+  page: number;
 }
 
 export interface Filters {
-  brands: Brand[];
+  brands?: Option[];
+  bodyTypes?: Option[];
+  priceRange?: {
+    min: number;
+    max: number;
+  };
 }
 
-export interface Brand {
-  brand: string;
+export interface Option {
+  value: string;
   count: number;
 }

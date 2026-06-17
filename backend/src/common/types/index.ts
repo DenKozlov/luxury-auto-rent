@@ -37,9 +37,16 @@ export type Car = Omit<
   images: ImageResponse[] | null;
 };
 
+interface Option {
+  value: string;
+  count: number;
+}
+
 export interface Filters {
-  brands: {
-    brand: string;
-    count: number;
-  }[];
+  brands: Option[];
+  priceRange: {
+    min: number;
+    max: number;
+  };
+  bodyTypes: Option[];
 }

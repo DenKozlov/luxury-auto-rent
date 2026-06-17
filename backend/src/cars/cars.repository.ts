@@ -27,4 +27,5 @@ export abstract class CarsRepository {
   abstract removeAll(): Promise<void>;
   abstract createMany(dtos: CreateCarDto[]): Promise<number>;
   abstract getFilters(): Promise<Filters>;
+  abstract getRecommended(): Promise<Car[] | null>;
 }

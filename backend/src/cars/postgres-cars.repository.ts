@@ -24,7 +24,6 @@ export class PostgresCarsRepository extends CarsRepository {
     const where = buildCarQuery(query);
     const { limit, page } = query;
     const skip = (page - 1) * limit;
-
     const [cars, totalItems] = await Promise.all([
       this.prisma.car.findMany({
         where,
@@ -150,16 +149,52 @@ export class PostgresCarsRepository extends CarsRepository {
   }
 
   async getFilters(): Promise<Filters> {
-    const rawBrands = await this.prisma.car.groupBy({
-      by: ['brand'],
-      _count: { id: true },
-    });
+    const [rawBrands, rawBodyTypes, prices] = await Promise.all([
+      this.prisma.car.groupBy({ by: ['brand'], _count: { id: true } }),
+      this.prisma.car.groupBy({ by: ['body_type'], _count: { id: true } }),
+      this.prisma.car.aggregate({
+        _min: { price_per_day_pln: true },
+        _max: { price_per_day_pln: true },
+      }),
+    ]);
     return {
       brands: rawBrands.map((item) => ({
-        brand: item.brand,
+        value: item.brand,
+        count: item._count.id,
+      })),
+      priceRange: {
+        min: prices._min.price_per_day_pln ?? 0,
+        max: prices._max.price_per_day_pln ?? 0,
+      },
+      bodyTypes: rawBodyTypes.map((item) => ({
+        value: item.body_type,
         count: item._count.id,
       })),
     };
+  }
+
+  async getRecommended(): Promise<Car[] | null> {
+    try {
+      const sortedByRating = await this.prisma.car.findMany({
+        orderBy: {
+          rating: 'desc',
+        },
+        include: {
+          images: {
+            select: {
+              id: true,
+              url: true,
+            },
+          },
+        },
+        take: 3,
+      });
+
+      return sortedByRating.length > 0 ? sortedByRating : null;
+    } catch (error) {
+      console.error('Error fetching recommended cars:', error);
+      return null;
+    }
   }
 
   // v8 ignore start

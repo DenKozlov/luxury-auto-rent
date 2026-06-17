@@ -30,12 +30,14 @@ export type CarAvgAggregateOutputType = {
   year: number | null
   mileage_km: number | null
   price_per_day_pln: number | null
+  rating: number | null
 }
 
 export type CarSumAggregateOutputType = {
   year: number | null
   mileage_km: number | null
   price_per_day_pln: number | null
+  rating: number | null
 }
 
 export type CarMinAggregateOutputType = {
@@ -50,6 +52,7 @@ export type CarMinAggregateOutputType = {
   price_per_day_pln: number | null
   is_available: boolean | null
   createdAt: Date | null
+  rating: number | null
 }
 
 export type CarMaxAggregateOutputType = {
@@ -64,6 +67,7 @@ export type CarMaxAggregateOutputType = {
   price_per_day_pln: number | null
   is_available: boolean | null
   createdAt: Date | null
+  rating: number | null
 }
 
 export type CarCountAggregateOutputType = {
@@ -79,6 +83,7 @@ export type CarCountAggregateOutputType = {
   price_per_day_pln: number
   is_available: number
   createdAt: number
+  rating: number
   _all: number
 }
 
@@ -87,12 +92,14 @@ export type CarAvgAggregateInputType = {
   year?: true
   mileage_km?: true
   price_per_day_pln?: true
+  rating?: true
 }
 
 export type CarSumAggregateInputType = {
   year?: true
   mileage_km?: true
   price_per_day_pln?: true
+  rating?: true
 }
 
 export type CarMinAggregateInputType = {
@@ -107,6 +114,7 @@ export type CarMinAggregateInputType = {
   price_per_day_pln?: true
   is_available?: true
   createdAt?: true
+  rating?: true
 }
 
 export type CarMaxAggregateInputType = {
@@ -121,6 +129,7 @@ export type CarMaxAggregateInputType = {
   price_per_day_pln?: true
   is_available?: true
   createdAt?: true
+  rating?: true
 }
 
 export type CarCountAggregateInputType = {
@@ -136,6 +145,7 @@ export type CarCountAggregateInputType = {
   price_per_day_pln?: true
   is_available?: true
   createdAt?: true
+  rating?: true
   _all?: true
 }
 
@@ -238,6 +248,7 @@ export type CarGroupByOutputType = {
   price_per_day_pln: number
   is_available: boolean
   createdAt: Date
+  rating: number
   _count: CarCountAggregateOutputType | null
   _avg: CarAvgAggregateOutputType | null
   _sum: CarSumAggregateOutputType | null
@@ -276,6 +287,7 @@ export type CarWhereInput = {
   price_per_day_pln?: Prisma.IntFilter<"Car"> | number
   is_available?: Prisma.BoolFilter<"Car"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Car"> | Date | string
+  rating?: Prisma.FloatFilter<"Car"> | number
   images?: Prisma.CarImageListRelationFilter
 }
 
@@ -292,6 +304,7 @@ export type CarOrderByWithRelationInput = {
   price_per_day_pln?: Prisma.SortOrder
   is_available?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  rating?: Prisma.SortOrder
   images?: Prisma.CarImageOrderByRelationAggregateInput
 }
 
@@ -311,6 +324,7 @@ export type CarWhereUniqueInput = Prisma.AtLeast<{
   price_per_day_pln?: Prisma.IntFilter<"Car"> | number
   is_available?: Prisma.BoolFilter<"Car"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Car"> | Date | string
+  rating?: Prisma.FloatFilter<"Car"> | number
   images?: Prisma.CarImageListRelationFilter
 }, "id">
 
@@ -327,6 +341,7 @@ export type CarOrderByWithAggregationInput = {
   price_per_day_pln?: Prisma.SortOrder
   is_available?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  rating?: Prisma.SortOrder
   _count?: Prisma.CarCountOrderByAggregateInput
   _avg?: Prisma.CarAvgOrderByAggregateInput
   _max?: Prisma.CarMaxOrderByAggregateInput
@@ -350,6 +365,7 @@ export type CarScalarWhereWithAggregatesInput = {
   price_per_day_pln?: Prisma.IntWithAggregatesFilter<"Car"> | number
   is_available?: Prisma.BoolWithAggregatesFilter<"Car"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Car"> | Date | string
+  rating?: Prisma.FloatWithAggregatesFilter<"Car"> | number
 }
 
 export type CarCreateInput = {
@@ -365,6 +381,7 @@ export type CarCreateInput = {
   price_per_day_pln: number
   is_available?: boolean
   createdAt?: Date | string
+  rating?: number
   images?: Prisma.CarImageCreateNestedManyWithoutCarInput
 }
 
@@ -381,6 +398,7 @@ export type CarUncheckedCreateInput = {
   price_per_day_pln: number
   is_available?: boolean
   createdAt?: Date | string
+  rating?: number
   images?: Prisma.CarImageUncheckedCreateNestedManyWithoutCarInput
 }
 
@@ -397,6 +415,7 @@ export type CarUpdateInput = {
   price_per_day_pln?: Prisma.IntFieldUpdateOperationsInput | number
   is_available?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
   images?: Prisma.CarImageUpdateManyWithoutCarNestedInput
 }
 
@@ -413,6 +432,7 @@ export type CarUncheckedUpdateInput = {
   price_per_day_pln?: Prisma.IntFieldUpdateOperationsInput | number
   is_available?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
   images?: Prisma.CarImageUncheckedUpdateManyWithoutCarNestedInput
 }
 
@@ -429,6 +449,7 @@ export type CarCreateManyInput = {
   price_per_day_pln: number
   is_available?: boolean
   createdAt?: Date | string
+  rating?: number
 }
 
 export type CarUpdateManyMutationInput = {
@@ -444,6 +465,7 @@ export type CarUpdateManyMutationInput = {
   price_per_day_pln?: Prisma.IntFieldUpdateOperationsInput | number
   is_available?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
 }
 
 export type CarUncheckedUpdateManyInput = {
@@ -459,6 +481,7 @@ export type CarUncheckedUpdateManyInput = {
   price_per_day_pln?: Prisma.IntFieldUpdateOperationsInput | number
   is_available?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
 }
 
 export type CarCountOrderByAggregateInput = {
@@ -474,12 +497,14 @@ export type CarCountOrderByAggregateInput = {
   price_per_day_pln?: Prisma.SortOrder
   is_available?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  rating?: Prisma.SortOrder
 }
 
 export type CarAvgOrderByAggregateInput = {
   year?: Prisma.SortOrder
   mileage_km?: Prisma.SortOrder
   price_per_day_pln?: Prisma.SortOrder
+  rating?: Prisma.SortOrder
 }
 
 export type CarMaxOrderByAggregateInput = {
@@ -494,6 +519,7 @@ export type CarMaxOrderByAggregateInput = {
   price_per_day_pln?: Prisma.SortOrder
   is_available?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  rating?: Prisma.SortOrder
 }
 
 export type CarMinOrderByAggregateInput = {
@@ -508,12 +534,14 @@ export type CarMinOrderByAggregateInput = {
   price_per_day_pln?: Prisma.SortOrder
   is_available?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  rating?: Prisma.SortOrder
 }
 
 export type CarSumOrderByAggregateInput = {
   year?: Prisma.SortOrder
   mileage_km?: Prisma.SortOrder
   price_per_day_pln?: Prisma.SortOrder
+  rating?: Prisma.SortOrder
 }
 
 export type CarScalarRelationFilter = {
@@ -545,6 +573,14 @@ export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
+export type FloatFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type CarCreateNestedOneWithoutImagesInput = {
   create?: Prisma.XOR<Prisma.CarCreateWithoutImagesInput, Prisma.CarUncheckedCreateWithoutImagesInput>
   connectOrCreate?: Prisma.CarCreateOrConnectWithoutImagesInput
@@ -572,6 +608,7 @@ export type CarCreateWithoutImagesInput = {
   price_per_day_pln: number
   is_available?: boolean
   createdAt?: Date | string
+  rating?: number
 }
 
 export type CarUncheckedCreateWithoutImagesInput = {
@@ -587,6 +624,7 @@ export type CarUncheckedCreateWithoutImagesInput = {
   price_per_day_pln: number
   is_available?: boolean
   createdAt?: Date | string
+  rating?: number
 }
 
 export type CarCreateOrConnectWithoutImagesInput = {
@@ -618,6 +656,7 @@ export type CarUpdateWithoutImagesInput = {
   price_per_day_pln?: Prisma.IntFieldUpdateOperationsInput | number
   is_available?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
 }
 
 export type CarUncheckedUpdateWithoutImagesInput = {
@@ -633,6 +672,7 @@ export type CarUncheckedUpdateWithoutImagesInput = {
   price_per_day_pln?: Prisma.IntFieldUpdateOperationsInput | number
   is_available?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
 }
 
 
@@ -679,6 +719,7 @@ export type CarSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = ru
   price_per_day_pln?: boolean
   is_available?: boolean
   createdAt?: boolean
+  rating?: boolean
   images?: boolean | Prisma.Car$imagesArgs<ExtArgs>
   _count?: boolean | Prisma.CarCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["car"]>
@@ -696,6 +737,7 @@ export type CarSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extension
   price_per_day_pln?: boolean
   is_available?: boolean
   createdAt?: boolean
+  rating?: boolean
 }, ExtArgs["result"]["car"]>
 
 export type CarSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -711,6 +753,7 @@ export type CarSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extension
   price_per_day_pln?: boolean
   is_available?: boolean
   createdAt?: boolean
+  rating?: boolean
 }, ExtArgs["result"]["car"]>
 
 export type CarSelectScalar = {
@@ -726,9 +769,10 @@ export type CarSelectScalar = {
   price_per_day_pln?: boolean
   is_available?: boolean
   createdAt?: boolean
+  rating?: boolean
 }
 
-export type CarOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "brand" | "model" | "year" | "mileage_km" | "body_type" | "engine" | "color" | "interior_material" | "price_per_day_pln" | "is_available" | "createdAt", ExtArgs["result"]["car"]>
+export type CarOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "brand" | "model" | "year" | "mileage_km" | "body_type" | "engine" | "color" | "interior_material" | "price_per_day_pln" | "is_available" | "createdAt" | "rating", ExtArgs["result"]["car"]>
 export type CarInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   images?: boolean | Prisma.Car$imagesArgs<ExtArgs>
   _count?: boolean | Prisma.CarCountOutputTypeDefaultArgs<ExtArgs>
@@ -754,6 +798,7 @@ export type $CarPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
     price_per_day_pln: number
     is_available: boolean
     createdAt: Date
+    rating: number
   }, ExtArgs["result"]["car"]>
   composites: {}
 }
@@ -1190,6 +1235,7 @@ export interface CarFieldRefs {
   readonly price_per_day_pln: Prisma.FieldRef<"Car", 'Int'>
   readonly is_available: Prisma.FieldRef<"Car", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Car", 'DateTime'>
+  readonly rating: Prisma.FieldRef<"Car", 'Float'>
 }
     
 

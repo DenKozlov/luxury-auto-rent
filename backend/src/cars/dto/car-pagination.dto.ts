@@ -1,9 +1,9 @@
 import {
+  IsArray,
   IsInt,
   IsNotEmpty,
   IsOptional,
   IsPositive,
-  IsString,
 } from 'class-validator';
 import { BodyType } from 'prisma/generated/enums';
 
@@ -19,18 +19,16 @@ export class CarQueryDto {
   limit: number;
 
   @IsOptional()
-  @IsString()
-  brand?: string;
+  @IsArray()
+  brands?: string[];
 
   @IsOptional()
-  @IsString()
-  bodyType?: BodyType;
+  @IsArray()
+  bodyTypes?: BodyType[];
 
+  @IsArray()
   @IsOptional()
-  minPrice?: number;
-
-  @IsOptional()
-  maxPrice?: number;
+  priceRange?: [number, number];
 
   @IsOptional()
   isAvailable?: boolean;

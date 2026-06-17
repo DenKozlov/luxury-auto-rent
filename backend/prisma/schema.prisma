@@ -21,6 +21,7 @@ model Car {
   is_available      Boolean  @default(true)
   createdAt         DateTime @default(now())
   images            CarImage[]
+  rating            Float      @default(5.0)
 }
 
 model CarImage {

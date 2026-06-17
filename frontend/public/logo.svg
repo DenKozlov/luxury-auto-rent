@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80">
+  <g text-anchor="middle" fill="#111111">
+    <text x="160" y="45" font-family="'Inter', 'Syncopate', 'Montserrat', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="48" font-weight="900" letter-spacing="3">
+      ZENITH
+    </text>
+    
+    <text x="160" y="60" font-family="'Inter', 'Montserrat', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="300" text-transform="uppercase" letter-spacing="11" opacity="0.7">
+      Luxury Fleet
+    </text>
+  </g>
+</svg>
