@@ -1,0 +1,42 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client"
+  output   = "./generated"
+}
+
+model Car {
+  id                String   @id @default(uuid()) 
+  brand             String
+  model             String
+  year              Int    
+  mileage_km        Int     
+  body_type         BodyType
+  engine            Json     
+  color             String
+  interior_material String
+  price_per_day_pln Int    
+  is_available      Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  images            CarImage[]
+  rating            Float      @default(5.0)
+}
+
+model CarImage {
+  id                String @id @default(uuid())
+  url               String
+  carId             String
+  car               Car    @relation(fields: [carId], references: [id], onDelete: Cascade)
+
+  @@index([carId])
+}
+
+enum BodyType {
+  SEDAN
+  SUV
+  HATCHBACK
+  COUPE
+  CONVERTIBLE
+}
