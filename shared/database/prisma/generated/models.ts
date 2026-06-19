@@ -8,6 +8,6 @@
  *
  * 🟢 You can import this file directly.
  */
-export type * from './models/Car'
-export type * from './models/CarImage'
-export type * from './commonInputTypes'
+export type * from './models/Car.ts'
+export type * from './models/CarImage.ts'
+export type * from './commonInputTypes.ts'

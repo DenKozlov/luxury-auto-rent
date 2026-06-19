@@ -1,0 +1,14 @@
+{
+    "name": "luxury-auto-rent-root",
+    "private": true,
+    "workspaces": [
+        "backend",
+        "frontend",
+        "shared/database"
+    ],
+    "scripts": {
+        "db:generate": "yarn workspace @my-app/database prisma generate",
+        "dev:backend": "yarn workspace luxury-auto-rent-backend start:dev",
+        "dev:frontend": "yarn workspace luxury-auto-rent-frontend dev"
+    }
+}
