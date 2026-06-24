@@ -42,6 +42,7 @@ const CarCard = ({ car }: { car: Car }) => {
             alt={brand}
             fill
             className="object-cover object-center"
+            sizes="h-56 w-80"
           />
           <Button className="absolute top-4 cursor-pointer right-4 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-black shadow-lg transition-all duration-300 hover:shadow-xl">
             <MoveRight className="h-4 w-4" />

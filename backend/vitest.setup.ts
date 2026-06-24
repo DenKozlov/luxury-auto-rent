@@ -1,5 +1,5 @@
 import { beforeEach, afterAll } from 'vitest';
-import { PrismaClient } from '@my-app/database';
+import { PrismaClient } from '@/prisma/generated/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 
 const adapter = new PrismaPg({

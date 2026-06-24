@@ -34,11 +34,12 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col pt-16 bg-[#121212]">
         <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-neutral-100 antialiased font-sans">
           <div className="w-full px-6 h-16 flex items-center justify-between">
-            <div className="relative w-48 h-12">
-              <Link href="/" className="hover:opacity-80 transition-opacity">
-                <Image src="/logo.svg" alt="ZENITH Logo" fill priority />
-              </Link>
-            </div>
+            <Link
+              href="/"
+              className="relative w-48 h-12 hover:opacity-80 transition-opacity"
+            >
+              <Image src="/logo.svg" alt="ZENITH Logo" fill priority />
+            </Link>
             <Link
               href="/auth"
               className="px-5 h-9 bg-neutral-950 text-white text-[10px] font-bold uppercase tracking-[0.2em] flex items-center justify-center border border-neutral-950 hover:bg-transparent hover:text-neutral-950 transition-all duration-200"

@@ -3,7 +3,7 @@ import { Car } from 'src/common/types';
 import { CarQueryDto } from './dto/car-pagination.dto';
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
-import { Prisma } from 'prisma/generated/client';
+import { Prisma } from '@/prisma/generated/client';
 
 export abstract class CarsRepository {
   abstract findAll(query: CarQueryDto): Promise<PaginatedResult<Car>>;

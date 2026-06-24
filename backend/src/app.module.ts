@@ -3,9 +3,16 @@ import { AppController } from './app.controller';
 import { CarsModule } from './cars/cars.module';
 import { StorageModule } from './storage/storage.module';
 import { PrismaModule } from 'prisma.module';
+import { AuthModule } from '@thallesp/nestjs-better-auth';
+import { auth } from '@/lib/auth';
 
 @Module({
-  imports: [CarsModule, StorageModule, PrismaModule],
+  imports: [
+    CarsModule,
+    StorageModule,
+    PrismaModule,
+    AuthModule.forRoot({ auth }),
+  ],
   controllers: [AppController],
 })
 export class AppModule {}

@@ -1,24 +1,110 @@
-import React from "react";
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { useState, SubmitEvent } from "react";
+import { useForm, Controller, type SubmitHandler } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { InputGroup } from "@/components/ui/input-group";
+import { Eye, EyeOff } from "lucide-react";
+import Image from "next/image";
+import { signIn, signUp } from "@/lib/actions/auth-actions";
+
+const filtersSchema = z.object({
+  name: z.string().min(6),
+  email: z.email("Incorrect email format"),
+  password: z
+    .string()
+    .min(8, "Password has to contain at least 8 symbols")
+    .regex(/[A-Z]/, "Password has to contain at least one capital letter")
+    .regex(/[0-9]/, "Password has to contain at least one number"),
+});
+
+export type AuthFormValues = z.infer<typeof filtersSchema>;
 
 export default function SignInPage() {
+  const [isSignIn, setIsSignIn] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<AuthFormValues>({
+    defaultValues: {
+      email: "",
+      password: "",
+      name: "",
+    },
+    resolver: zodResolver(filtersSchema),
+  });
+
+  const onSubmit = async (
+    // e: SubmitEvent<HTMLFormElement>,
+    values: AuthFormValues,
+  ) => {
+    const { email, password, name } = values;
+    // e.preventDefault();
+    setIsLoading(true);
+    try {
+      if (isSignIn) {
+        const result = await signIn(email, password);
+        if (result.data && !result.data.user) {
+          setError("Invalid email or password");
+        }
+      } else {
+        const result = await signUp(email, password, name);
+        if (result.data && !result.data.user) {
+          setError("Failed to create account");
+        }
+      }
+    } catch (error) {
+      setError(
+        `Authentication error: ${error instanceof Error ? error.message : "uknown error"}`,
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <div className="w-full max-w-sm bg-white p-8 border border-gray-200 shadow-sm rounded-xl">
-        <h1 className="text-2xl font-bold text-center mb-2">Welcome Back</h1>
-        <p className="text-gray-500 text-center mb-8">
-          Sign in to your account to continue
+        <h1 className="text-2xl font-bold text-center mb-1">
+          {isSignIn ? "Welcome Back" : "Create Account"}
+        </h1>
+        <p className="text-gray-500 text-center mb-6">
+          {isSignIn
+            ? "Sign in to your account to continue"
+            : "Sign up to get started with Zenith"}
         </p>
         <div className="space-y-3">
-          <button className="w-full flex items-center justify-center gap-2 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium">
-            <span>Continue with Google</span>
-          </button>
-
-          <button className="w-full flex items-center justify-center gap-2 py-2.5 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors font-medium">
-            <span>Continue with GitHub</span>
-          </button>
+          <Button
+            variant="outline"
+            className="w-full cursor-pointer h-11 flex items-center justify-center gap-3 rounded-lg border-gray-200 hover:bg-gray-50 transition-all duration-200"
+          >
+            <Image width={20} height={20} src="/google.svg" alt="Google" />
+            <span className="font-medium text-gray-700">
+              Continue with Google
+            </span>
+          </Button>
+          <Button className="w-full cursor-pointer h-11 flex items-center justify-center gap-3 rounded-lg bg-black text-white hover:bg-gray-800 transition-all duration-200">
+            <Image
+              width={20}
+              height={20}
+              src="/github.svg"
+              alt="GitHub"
+              className="invert"
+            />
+            <span className="font-medium text-white">Continue with GitHub</span>
+          </Button>
         </div>
 
-        <div className="relative my-8">
+        <div className="relative my-7">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-gray-200"></div>
           </div>
@@ -28,40 +114,95 @@ export default function SignInPage() {
             </span>
           </div>
         </div>
-        <form className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Email address
-            </label>
-            <input
-              type="email"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-              placeholder="Enter your email"
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {!isSignIn && (
+            <Controller
+              name="name"
+              control={control}
+              render={({ field }) => (
+                <Field>
+                  <FieldLabel htmlFor="name">Full Name</FieldLabel>
+                  <Input
+                    {...field}
+                    id="name"
+                    autoComplete="off"
+                    placeholder="Enter your full name"
+                    aria-invalid={!!errors.name}
+                  />
+                  <FieldDescription className="text-red-500">
+                    {errors.name?.message}
+                  </FieldDescription>
+                </Field>
+              )}
             />
-          </div>
+          )}
+          <Controller
+            name="email"
+            control={control}
+            render={({ field }) => (
+              <Field>
+                <FieldLabel htmlFor="email">Email</FieldLabel>
+                <Input
+                  {...field}
+                  id="email"
+                  autoComplete="off"
+                  type="email"
+                  placeholder="Enter your email"
+                  aria-invalid={!!errors.email}
+                />
+                <FieldDescription className="text-red-500">
+                  {errors.email?.message}
+                </FieldDescription>
+              </Field>
+            )}
+          />
+          <Controller
+            name="password"
+            control={control}
+            render={({ field }) => (
+              <Field>
+                <FieldLabel htmlFor="password">Password</FieldLabel>
+                <InputGroup className="transition-all focus-within:ring-ring/50 focus-within:ring-3 focus-within:border-ring aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20">
+                  <Input
+                    {...field}
+                    id="password"
+                    placeholder="Enter your password"
+                    type={showPassword ? "text" : "password"}
+                    className="border-none focus-visible:ring-0 focus-visible:ring-offset-0 aria-invalid:ring-0 aria-invalid:ring-offset-0"
+                    aria-invalid={!!errors.password}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <Eye /> : <EyeOff />}
+                  </Button>
+                </InputGroup>
+                <FieldDescription className="text-red-500">
+                  {errors.password?.message}
+                </FieldDescription>
+              </Field>
+            )}
+          />
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Password</label>
-            <input
-              type="password"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-              placeholder="Enter your password"
-            />
-          </div>
-
-          <button className="w-full py-2.5 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors font-semibold mt-2">
-            Sign In
-          </button>
+          <Button className="w-full h-11 cursor-pointer py-2.5 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors font-semibold mt-2">
+            {isSignIn ? "Sign In" : "Sign up"}
+          </Button>
         </form>
 
         <p className="text-center text-sm text-gray-500 mt-6">
-          Don`t have an account?
-          <a
-            href="/signup"
-            className="text-black font-semibold hover:underline"
+          {isSignIn ? "Don’t have an account?" : "Already have an account?"}
+          <Button
+            variant="link"
+            className="h-auto ml-1 p-0 font-semibold text-primary cursor-pointer"
+            onClick={() => {
+              setIsSignIn(!isSignIn);
+              reset();
+            }}
           >
-            Sign up
-          </a>
+            {isSignIn ? "Sign up" : "Sign in"}
+          </Button>
         </p>
       </div>
     </div>
