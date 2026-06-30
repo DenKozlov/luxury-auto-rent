@@ -9,7 +9,7 @@ const Cars = () => {
   const [filters, setFilters] = useState<FiltersFormValues>({});
 
   return (
-    <div className="flex gap-8 p-8">
+    <div className="flex gap-8 p-8 pt-16">
       <aside className="w-80 shrink-0">
         <SidebarFilters onFiltersSubmit={setFilters} />
       </aside>

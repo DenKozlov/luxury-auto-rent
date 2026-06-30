@@ -8,9 +8,7 @@ export const carService = {
   },
 
   create: async (formData: FormData): Promise<Car> => {
-    const { data } = await api.post<Car>("/cars", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    const { data } = await api.post<Car>("/cars", formData);
     return data;
   },
 

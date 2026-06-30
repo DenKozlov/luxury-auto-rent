@@ -49,7 +49,7 @@ const CarPage = ({ params }: { params: Promise<{ id: string }> }) => {
   };
 
   return (
-    <div className="px-4 py-8">
+    <div className="pb-4 py-8 pt-16">
       <Breadcrumbs bcpPages={["Details"]} />
       <div className="w-[700px] mx-auto space-y-6 p-8 bg-[#1c1c1e]">
         {images.length > 0 ? (
