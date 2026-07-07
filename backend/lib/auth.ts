@@ -3,7 +3,7 @@ import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { prisma } from './prisma';
 
 export const auth = betterAuth({
-  baseURL: 'http://localhost:3001',
+  baseURL: process.env.BETTER_AUTH_URL,
   session: {
     deferSessionRefresh: true,
     expiresIn: 60 * 60 * 24,
@@ -22,5 +22,5 @@ export const auth = betterAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     },
   },
-  trustedOrigins: ['http://localhost:3000'],
+  trustedOrigins: ['http://localhost:3000', 'http://localhost:3003'],
 });

@@ -6,6 +6,7 @@ import { PrismaModule } from 'prisma.module';
 import { AuthModule } from '@thallesp/nestjs-better-auth';
 import { auth } from '@/lib/auth';
 import { UsersModule } from './users/users.module';
+import { TestingModule } from '../test/testing/testing.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { UsersModule } from './users/users.module';
     PrismaModule,
     AuthModule.forRoot({ auth }),
     UsersModule,
+    TestingModule,
   ],
   controllers: [AppController],
 })

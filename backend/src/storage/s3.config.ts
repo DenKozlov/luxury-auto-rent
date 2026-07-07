@@ -8,7 +8,7 @@ export const BUCKET_CONFIG = {
   },
   [BucketType.USERS]: {
     name: 'AWS_BUCKET_NAME_USERS',
-    getCdn: () => 'https://dpw47tz0j7boh.cloudfront.net/',
+    getCdn: () => 'https://dpw47tz0j7boh.cloudfront.net',
   },
 } as const;
 

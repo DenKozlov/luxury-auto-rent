@@ -1,18 +1,29 @@
-import { createAuthClient } from "better-auth/react";
-
+import { createAuthClient, SuccessContext } from "better-auth/react";
 export const authClient = createAuthClient({
-  baseURL: "http://localhost:3001",
+  baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL || "http://localhost:3001",
 });
 
 const { useSession, getSession } = authClient;
 
-const signUp = async (email: string, password: string, name: string) => {
-  const result = await authClient.signUp.email({
-    name,
-    email,
-    password,
-    callbackURL: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/`,
-  });
+const signUp = async (
+  email: string,
+  password: string,
+  name: string,
+  onSuccess:
+    | ((context: SuccessContext<unknown>) => void | Promise<void>)
+    | undefined,
+) => {
+  const result = await authClient.signUp.email(
+    {
+      name,
+      email,
+      password,
+      callbackURL: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/`,
+    },
+    {
+      onSuccess,
+    },
+  );
 
   return result;
 };

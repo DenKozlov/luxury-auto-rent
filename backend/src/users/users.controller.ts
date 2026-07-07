@@ -9,7 +9,7 @@ import {
   Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import * as nestjsBetterAuth from '@thallesp/nestjs-better-auth';
 import express from 'express';
@@ -23,7 +23,7 @@ export class UsersController {
 
   @Patch('/me')
   @UseGuards(nestjsBetterAuth.AuthGuard)
-  @UseInterceptors(FilesInterceptor('images'))
+  @UseInterceptors(FileInterceptor('file'))
   async update(
     @Req() req: express.Request,
     @nestjsBetterAuth.Session() session: nestjsBetterAuth.UserSession,

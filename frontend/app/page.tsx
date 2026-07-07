@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <>
+    <main role="main">
       <section className="relative w-full min-h-[85vh] bg-neutral-950 flex items-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
@@ -12,6 +12,7 @@ export default function Home() {
             alt="Zenith Fleet Performance Car"
             fill
             priority
+            fetchPriority="high"
             sizes="100vw"
             className="object-cover object-center select-none pointer-events-none"
           />
@@ -52,6 +53,6 @@ export default function Home() {
         </div>
       </section>
       <TopRated />
-    </>
+    </main>
   );
 }

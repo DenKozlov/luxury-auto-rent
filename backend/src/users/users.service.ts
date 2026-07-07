@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { S3Service } from '../storage/s3.service';
 import { UserSession } from '@thallesp/nestjs-better-auth';
@@ -7,7 +7,7 @@ import { Request } from 'express';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly s3Service: S3Service) {}
+  constructor(@Inject(S3Service) private readonly s3Service: S3Service) {}
 
   async update(
     req: Request,
@@ -17,7 +17,6 @@ export class UsersService {
   ) {
     const userId = session.user.id;
     const updateData: { name?: string; image?: string } = {};
-
     if (file) {
       const key = `${userId}-${file.originalname}`;
       updateData.image = await this.s3Service.uploadFile(file, key);

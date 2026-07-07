@@ -13,6 +13,7 @@ import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
 import { signIn, signInSocial, signUp } from "@/lib/actions/auth-actions";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const baseFields = {
   email: z.email("Incorrect email format"),
@@ -33,6 +34,7 @@ const signUpSchema = z.object({
 export type AuthFormValues = z.infer<typeof baseSchema> & { name?: string };
 
 const AuthForm = () => {
+  const router = useRouter();
   const [isSignIn, setIsSignIn] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -72,25 +74,18 @@ const AuthForm = () => {
     setIsLoading(true);
     setError(null);
 
-    try {
-      if (isSignIn) {
-        const result = await signIn(email, password);
-        if (result.data && !result.data.user) {
-          setError("Invalid email or password");
-        }
-      } else {
-        const result = await signUp(email, password, name as string);
-        if (result.data && !result.data.user) {
-          setError("Failed to create account");
-        }
-      }
-    } catch (error) {
-      setError(
-        `Authentication error: ${error instanceof Error ? error.message : "uknown error"}`,
-      );
-    } finally {
+    const action = isSignIn
+      ? signIn(email, password)
+      : signUp(email, password, name as string, () => router.push("/"));
+
+    const { error } = await action;
+
+    if (error) {
+      setError(error.message || "An error occurred while authenticating");
       setIsLoading(false);
+      return;
     }
+    setIsLoading(false);
   };
 
   return (
@@ -113,6 +108,7 @@ const AuthForm = () => {
         </p>
         <div className="space-y-3">
           <Button
+            data-testid="google-button"
             onClick={() => handleSocialAuth("google")}
             variant="outline"
             className="w-full cursor-pointer h-11 flex items-center justify-center gap-3 rounded-lg border-gray-200 hover:bg-gray-50 transition-all duration-200"
@@ -123,6 +119,7 @@ const AuthForm = () => {
             </span>
           </Button>
           <Button
+            data-testid="github-button"
             onClick={() => handleSocialAuth("github")}
             className="w-full cursor-pointer h-11 flex items-center justify-center gap-3 rounded-lg bg-black text-white hover:bg-gray-800 transition-all duration-200"
           >
@@ -147,7 +144,13 @@ const AuthForm = () => {
             </span>
           </div>
         </div>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          onChange={() => {
+            if (error) setError(null);
+          }}
+          className="space-y-4"
+        >
           {!isSignIn && (
             <Controller
               name="name"
@@ -205,9 +208,13 @@ const AuthForm = () => {
                     aria-invalid={!!errors.password}
                   />
                   <Button
+                    data-testid="show-password-button"
                     type="button"
                     variant="ghost"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
                   >
                     {showPassword ? <Eye /> : <EyeOff />}
                   </Button>
@@ -218,7 +225,7 @@ const AuthForm = () => {
               </Field>
             )}
           />
-
+          <div className="text-red-500 mb-0 text-sm">{error}</div>
           <Button className="w-full gap-2 h-11 cursor-pointer py-2.5 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors font-semibold mt-2">
             {isLoading && <Spinner />}
             {isSignIn ? "Sign In" : "Sign up"}

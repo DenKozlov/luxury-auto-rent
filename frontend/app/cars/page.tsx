@@ -13,7 +13,7 @@ const Cars = () => {
       <aside className="w-80 shrink-0">
         <SidebarFilters onFiltersSubmit={setFilters} />
       </aside>
-      <main className="flex-1 ">
+      <main className="flex-1" role="main">
         <CarList filters={filters} />
       </main>
     </div>

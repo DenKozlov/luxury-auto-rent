@@ -66,6 +66,7 @@ const CarPage = ({ params }: { params: Promise<{ id: string }> }) => {
                     fill
                     className="object-cover"
                     priority
+                    sizes="635 355"
                   />
                 </div>
               ))}
