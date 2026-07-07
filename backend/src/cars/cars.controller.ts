@@ -15,6 +15,7 @@ import {
   ParseBoolPipe,
   ParseArrayPipe,
 } from '@nestjs/common';
+import { AllowAnonymous } from '@thallesp/nestjs-better-auth';
 import { CarsService } from './cars.service';
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
@@ -104,6 +105,7 @@ export class CarsController {
     type: CreateCarDto,
     isArray: true,
   })
+  @AllowAnonymous()
   @Get()
   async findAll(
     @Query('page', ParseIntPipe) page: number,
@@ -137,6 +139,7 @@ export class CarsController {
     description: 'Car fetched successfully',
     type: CreateCarDto,
   })
+  @AllowAnonymous()
   @Get('details/:id')
   findOne(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.carsService.findOne(id);
@@ -179,11 +182,13 @@ export class CarsController {
     return this.carsService.createMany(createCarDtos);
   }
 
+  @AllowAnonymous()
   @Get('/filters')
   async getFilters() {
     return await this.carsService.getFilters();
   }
 
+  @AllowAnonymous()
   @Get('/recommended')
   async getRecommended() {
     return await this.carsService.getRecommended();

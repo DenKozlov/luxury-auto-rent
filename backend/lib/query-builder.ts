@@ -1,5 +1,5 @@
 import { CarQueryDto } from 'src/cars/dto/car-pagination.dto';
-import { Prisma } from '../prisma/generated/client';
+import { Prisma } from '@/prisma/generated/client';
 
 export function buildCarQuery(query: CarQueryDto) {
   const where: Prisma.CarWhereInput = {};

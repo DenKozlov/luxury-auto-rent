@@ -3,16 +3,9 @@ import { Car } from "@/types";
 import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import {
-  CalendarDays,
-  Gauge,
-  Fuel,
-  Car as CarIcon,
-  MoveRight,
-} from "lucide-react";
+import { CalendarDays, Gauge, Fuel, Car as CarIcon } from "lucide-react";
 import Link from "next/link";
 import CarRating from "./car-ratings";
-import { Button } from "./ui/button";
 
 const CarCard = ({ car }: { car: Car }) => {
   const {
@@ -31,7 +24,7 @@ const CarCard = ({ car }: { car: Car }) => {
     colorClass: is_available ? "bg-green-700" : "bg-yellow-700",
   };
   return (
-    <Link href={`/cars/${id}`}>
+    <Link href={`/cars/${id}`} data-testid="car-card-link">
       <Card
         key={car.id}
         className="pt-0 w-80 min-w-80 bg-[#1c1c1e] text-white border border-[#2c2c2e] h-96 group transition-all duration-300 ease-in-out hover:scale-102 hover:shadow-2xl hover:z-10"
@@ -42,10 +35,8 @@ const CarCard = ({ car }: { car: Car }) => {
             alt={brand}
             fill
             className="object-cover object-center"
+            sizes="h-56 w-80"
           />
-          <Button className="absolute top-4 cursor-pointer right-4 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-black shadow-lg transition-all duration-300 hover:shadow-xl">
-            <MoveRight className="h-4 w-4" />
-          </Button>
         </div>
         <Separator />
         <CardContent>
@@ -54,9 +45,9 @@ const CarCard = ({ car }: { car: Car }) => {
             <CarRating rating={car.rating} />
           </div>
           <div className="flex flex-wrap items-center justify-between">
-            <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+            <p className="scroll-m-20 text-2xl font-semibold tracking-tight">
               {model}
-            </h3>
+            </p>
             <Badge className={badgeSettings.colorClass}>
               {badgeSettings.label}
             </Badge>

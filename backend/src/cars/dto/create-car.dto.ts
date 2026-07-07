@@ -8,7 +8,7 @@ import {
   IsEnum,
 } from 'class-validator';
 import { EngineDto } from './engine.dto';
-import { BodyType } from '../../../prisma/generated/client';
+import { BodyType } from '@/prisma/generated/client';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateCarDto {

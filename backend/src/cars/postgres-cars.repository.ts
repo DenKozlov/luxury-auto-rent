@@ -9,7 +9,7 @@ import { PrismaService } from '../../prisma.service';
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
 import { instanceToPlain } from 'class-transformer';
-import { Prisma } from '../../prisma/generated/client';
+import { Prisma } from '@/prisma/generated/client';
 import { CarQueryDto } from './dto/car-pagination.dto';
 import { buildCarQuery } from 'lib/query-builder';
 import { Car, Filters, PaginatedResult } from 'src/common/types';

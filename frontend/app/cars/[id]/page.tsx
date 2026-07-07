@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect, useCallback } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, CheckCircle, XCircle } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { carService } from "@/services/car.service";
 import Breadcrumbs from "@/components/breadcrumbs";
@@ -49,7 +49,7 @@ const CarPage = ({ params }: { params: Promise<{ id: string }> }) => {
   };
 
   return (
-    <div className="px-4 py-8">
+    <div className="pb-4 py-8 pt-16">
       <Breadcrumbs bcpPages={["Details"]} />
       <div className="w-[700px] mx-auto space-y-6 p-8 bg-[#1c1c1e]">
         {images.length > 0 ? (
@@ -66,6 +66,7 @@ const CarPage = ({ params }: { params: Promise<{ id: string }> }) => {
                     fill
                     className="object-cover"
                     priority
+                    sizes="635 355"
                   />
                 </div>
               ))}
