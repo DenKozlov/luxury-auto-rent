@@ -1,9 +1,15 @@
-import { Inject, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Inject,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { S3Service } from '../storage/s3.service';
 import { UserSession } from '@thallesp/nestjs-better-auth';
 import { auth } from '@/lib/auth';
 import { Request } from 'express';
+import { AuthenticatedRequest } from '../common/types';
 
 @Injectable()
 export class UsersService {
@@ -32,5 +38,31 @@ export class UsersService {
         cookie: req.headers.cookie || '',
       },
     });
+  }
+
+  async softDelete(
+    req: AuthenticatedRequest,
+    session: UserSession,
+    id: string,
+  ) {
+    const headers = { cookie: req.headers.cookie || '' };
+    const sessionToken = req.session.session.token;
+
+    if (id !== session.user.id) {
+      throw new ForbiddenException('You can only deactivate your own account');
+    }
+
+    if (!sessionToken) {
+      throw new UnauthorizedException('Session token not found');
+    }
+
+    const deletedAt = new Date();
+
+    await auth.api.updateUser({
+      body: { deletedAt },
+      headers,
+    });
+
+    return { success: true, deletedAt };
   }
 }
