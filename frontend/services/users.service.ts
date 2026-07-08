@@ -6,4 +6,8 @@ export const usersService = {
     const { data } = await api.patch<User>("/users/me", formData);
     return data;
   },
+  deactivateAccount: async (id: string): Promise<User> => {
+    const { data } = await api.post(`/users/${id}/deactivate`);
+    return data;
+  },
 };

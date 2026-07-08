@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import { User } from "better-auth";
 import { redirect } from "next/navigation";
 import { ProfileEditDialog } from "@/components/edit-profile-form";
+import { DeactivateContainer } from "@/components/deactivate-container";
 
 export default async function ProfilePage() {
   const session = await getSession({
@@ -36,6 +37,7 @@ export default async function ProfilePage() {
           </div>
         </div>
         <ProfileEditDialog user={user} />
+        <DeactivateContainer id={user.id} />
       </div>
     </div>
   );

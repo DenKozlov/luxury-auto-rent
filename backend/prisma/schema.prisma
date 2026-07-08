@@ -43,8 +43,9 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+  deletedAt     DateTime?
 
-  @@unique([email])
+  @@unique([email, deletedAt], name: "unique_active_email")
   @@map("user")
 }
 
