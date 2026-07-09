@@ -5,8 +5,8 @@ services:
     image: postgres:15-alpine
     container_name: test-db-1
     environment:
-      POSTGRES_USER: test_user
-      POSTGRES_PASSWORD: test_password
-      POSTGRES_DB: test_db
+      POSTGRES_USER: ${POSTGRES_TEST_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_TEST_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_TEST_DB}
     ports:
       - '5433:5432'
