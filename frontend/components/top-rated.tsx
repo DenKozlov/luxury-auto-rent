@@ -35,9 +35,7 @@ const TopRated = () => {
 
   return (
     <div className="flex justify-center gap-8 pt-6 pb-12">
-      {cars?.map((car) => (
-        <CarCard car={car} key={car.id} />
-      ))}
+      {cars && cars.map((car) => <CarCard car={car} key={car.id} />)}
     </div>
   );
 };

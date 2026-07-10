@@ -152,6 +152,7 @@ export class CarsController {
     type: CreateCarDto,
   })
   @Patch(':id')
+  @AllowAnonymous()
   @UseInterceptors(FilesInterceptor('images'))
   update(
     @Param('id') id: string,

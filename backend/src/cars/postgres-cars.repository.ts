@@ -190,7 +190,9 @@ export class PostgresCarsRepository extends CarsRepository {
         take: 3,
       });
 
-      return sortedByRating.length > 0 ? sortedByRating : null;
+      const data = sortedByRating as Car[];
+
+      return sortedByRating.length > 0 ? data : null;
     } catch (error) {
       console.error('Error fetching recommended cars:', error);
       return null;

@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { Transport, MicroserviceOptions } from '@nestjs/microservices';
 
 const logger = new Logger('Bootstrap');
 
@@ -10,6 +11,15 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['error', 'warn', 'log'],
     bodyParser: false,
+  });
+
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.RMQ,
+    options: {
+      urls: [process.env.RABBITMQ_URL || ''],
+      queue: 'notifications_queue',
+      queueOptions: { durable: true },
+    },
   });
 
   app.useGlobalPipes(
@@ -37,6 +47,7 @@ async function bootstrap() {
   });
 
   const port = process.env.PORT ?? 3000;
+  await app.startAllMicroservices();
   await app.listen(port);
   logger.log(`Application is running on: http://localhost:${port}`);
 }

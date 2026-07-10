@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Prisma } from '../../prisma/generated/client';
 import { ImagesRepository } from './images.repository';
 import { S3Service } from '../storage/s3.service';
@@ -6,8 +6,9 @@ import { S3Service } from '../storage/s3.service';
 @Injectable()
 export class ImagesService {
   constructor(
+    @Inject(ImagesRepository)
     private readonly imagesRepository: ImagesRepository,
-    private readonly s3Service: S3Service,
+    @Inject(S3Service) private readonly s3Service: S3Service,
   ) {}
   async createImages(
     carId: string,
