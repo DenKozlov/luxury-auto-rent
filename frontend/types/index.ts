@@ -1,3 +1,6 @@
+import { PaginationState, SortingState } from "@tanstack/react-table";
+import { User } from "better-auth";
+
 export type BodyType = "SEDAN" | "SUV" | "HATCHBACK" | "COUPE" | "CONVERTIBLE";
 
 interface Engine {
@@ -52,4 +55,28 @@ export interface Filters {
 export interface Option {
   value: string;
   count: number;
+}
+
+export interface ExtendedUser extends User {
+  status: "ACTIVE" | "DEACTIVATED";
+  lastLoginAt: string;
+}
+
+export interface ListUsersResponse {
+  users: ExtendedUser[];
+  total: number;
+  limit?: number;
+  offset?: number;
+}
+
+export interface ListUsersParams {
+  searchBy: string;
+  debouncedSearch: string;
+  sorting: SortingState;
+  pagination: PaginationState;
+}
+
+export interface Invitation {
+  id: string;
+  invitedBy: string;
 }

@@ -9,14 +9,14 @@ import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { InputGroup } from "@/components/ui/input-group";
-import { ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
 import { signIn, signInSocial, signUp } from "@/lib/actions/auth-actions";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { invitationsService } from "@/services/invitations.service";
 
 const baseFields = {
-  email: z.email("Incorrect email format"),
   password: z
     .string()
     .min(8, "Password has to contain at least 8 symbols")
@@ -24,22 +24,39 @@ const baseFields = {
     .regex(/[0-9]/, "Password has to contain at least one number"),
 };
 
-const baseSchema = z.object(baseFields);
+const signInSchema = z.object({
+  ...baseFields,
+  email: z.email("Incorrect email format"),
+});
 
 const signUpSchema = z.object({
   ...baseFields,
   name: z.string().min(6).max(50),
 });
 
-export type AuthFormValues = z.infer<typeof baseSchema> & { name?: string };
+type SignInValues = z.infer<typeof signInSchema>;
+type SignUpValues = z.infer<typeof signUpSchema>;
 
-const AuthForm = () => {
+// Создаем тип, который точно знает, какие поля нужны в зависимости от режима
+export type AuthFormValues = (SignInValues | SignUpValues) & {
+  email?: string;
+  name?: string;
+};
+
+const AuthForm = ({
+  token,
+  invitationEmail,
+}: {
+  token?: string;
+  invitationEmail?: string;
+}) => {
   const router = useRouter();
-  const [isSignIn, setIsSignIn] = useState(false);
+  const isSignIn = !token;
+  // const [isSignIn, setIsSignIn] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const filtersSchema = isSignIn ? baseSchema : signUpSchema;
+  const filtersSchema = isSignIn ? signInSchema : signUpSchema;
   const {
     control,
     handleSubmit,
@@ -47,9 +64,9 @@ const AuthForm = () => {
     formState: { errors },
   } = useForm<AuthFormValues>({
     defaultValues: {
-      email: "",
       password: "",
       name: "",
+      email: "",
     },
     resolver: zodResolver(filtersSchema),
   });
@@ -74,29 +91,31 @@ const AuthForm = () => {
     setIsLoading(true);
     setError(null);
 
-    const action = isSignIn
-      ? signIn(email, password)
-      : signUp(email, password, name as string, () => router.push("/"));
-
-    const { error } = await action;
-
-    if (error) {
-      setError(error.message || "An error occurred while authenticating");
-      setIsLoading(false);
+    if (isSignIn) {
+      const { error } = await signIn(email!, password);
+      if (error) {
+        setError(error.message || "An error occurred while authenticating");
+        setIsLoading(false);
+      }
       return;
+    }
+
+    try {
+      await invitationsService.accept({ token: token!, name: name!, password });
+      router.refresh();
+      router.push("/");
+    } catch (e) {
+      const error = e as Error;
+      setError(
+        error.message || "Failed to create account. Please try again later.",
+      );
+      setIsLoading(false);
     }
     setIsLoading(false);
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <Link
-        href="/"
-        className="absolute top-8 left-8 flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back to Home
-      </Link>
       <div className="w-full max-w-sm bg-white p-8 border border-gray-200 shadow-sm rounded-xl">
         <h1 className="text-2xl font-bold text-center mb-1">
           {isSignIn ? "Welcome Back" : "Create Account"}
@@ -106,7 +125,12 @@ const AuthForm = () => {
             ? "Sign in to your account to continue"
             : "Sign up to get started with Zenith"}
         </p>
-        <div className="space-y-3">
+        {!isSignIn && (
+          <p className="mb-4 text-center">
+            Creating an account for <strong>{invitationEmail}</strong>
+          </p>
+        )}
+        {/* <div className="space-y-3">
           <Button
             data-testid="google-button"
             onClick={() => handleSocialAuth("google")}
@@ -132,7 +156,7 @@ const AuthForm = () => {
             />
             <span className="font-medium text-white">Continue with GitHub</span>
           </Button>
-        </div>
+        </div> 
 
         <div className="relative my-7">
           <div className="absolute inset-0 flex items-center">
@@ -144,6 +168,7 @@ const AuthForm = () => {
             </span>
           </div>
         </div>
+        */}
         <form
           onSubmit={handleSubmit(onSubmit)}
           onChange={() => {
@@ -172,26 +197,28 @@ const AuthForm = () => {
               )}
             />
           )}
-          <Controller
-            name="email"
-            control={control}
-            render={({ field }) => (
-              <Field>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
-                <Input
-                  {...field}
-                  id="email"
-                  autoComplete="off"
-                  type="email"
-                  placeholder="Enter your email"
-                  aria-invalid={!!errors.email}
-                />
-                <FieldDescription className="text-red-500">
-                  {errors.email?.message}
-                </FieldDescription>
-              </Field>
-            )}
-          />
+          {isSignIn && (
+            <Controller
+              name="email"
+              control={control}
+              render={({ field }) => (
+                <Field>
+                  <FieldLabel htmlFor="email">Email</FieldLabel>
+                  <Input
+                    {...field}
+                    id="email"
+                    autoComplete="off"
+                    type="email"
+                    placeholder="Enter your email"
+                    aria-invalid={!!errors.email}
+                  />
+                  <FieldDescription className="text-red-500">
+                    {errors.email?.message}
+                  </FieldDescription>
+                </Field>
+              )}
+            />
+          )}
           <Controller
             name="password"
             control={control}
@@ -232,7 +259,7 @@ const AuthForm = () => {
           </Button>
         </form>
 
-        <p className="text-center text-sm text-gray-500 mt-6">
+        {/* <p className="text-center text-sm text-gray-500 mt-6">
           {isSignIn ? "Don’t have an account?" : "Already have an account?"}
           <Button
             variant="link"
@@ -244,7 +271,7 @@ const AuthForm = () => {
           >
             {isSignIn ? "Sign up" : "Sign in"}
           </Button>
-        </p>
+        </p> */}
       </div>
     </div>
   );

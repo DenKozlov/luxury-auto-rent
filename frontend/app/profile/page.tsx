@@ -13,14 +13,14 @@ export default async function ProfilePage() {
       headers: await headers(),
     },
   });
-
   if (!session.data) {
     redirect("/");
   }
+
   const user = session.data.user as unknown as User;
 
   return (
-    <div className="min-h-screen bg-black text-white p-8">
+    <div className="min-h-screen bg-black text-white p-8 mt-16">
       <div className="max-w-2xl mx-auto border border-zinc-800 p-10 bg-zinc-950/50">
         <h1 className="text-3xl font-serif mb-8">My Profile</h1>
 

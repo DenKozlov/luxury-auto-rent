@@ -1,6 +1,7 @@
 import { Prisma } from '@/prisma/generated/client';
 import { Request } from 'express';
 import { User, Session } from 'better-auth';
+import { EmailSubjectEnum } from '../constants';
 
 export interface PaginatedResult<T> {
   data: T[];
@@ -69,3 +70,12 @@ export interface WelcomeContext {
 }
 
 export type MailContext = DeactivationContext | WelcomeContext;
+
+export type EmailSubject = `${EmailSubjectEnum}`;
+
+export type SendEamilParams<T> = {
+  to: string;
+  subject: string;
+  templateName: EmailSubject;
+  context: T;
+};

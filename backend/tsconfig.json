@@ -14,7 +14,9 @@
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "outDir": "./dist",
+    "ignoreDeprecations": "6.0",
     "baseUrl": "./",
+    "types": ["node", "multer"],
     "paths": {
       "@/*": ["./*"]
     },

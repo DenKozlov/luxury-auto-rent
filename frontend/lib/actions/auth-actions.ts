@@ -1,6 +1,15 @@
 import { createAuthClient, SuccessContext } from "better-auth/react";
+import { adminClient } from "better-auth/client/plugins";
+import { ac, admin } from "@/lib/actions/permissions";
+
 export const authClient = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL || "http://localhost:3001",
+  plugins: [
+    adminClient({
+      ac,
+      roles: { admin },
+    }),
+  ],
 });
 
 const { useSession, getSession } = authClient;
@@ -51,4 +60,20 @@ const signOut = async () => {
   return result;
 };
 
-export { signIn, signUp, signOut, useSession, signInSocial, getSession };
+const getUser = async (id: string) => {
+  return await authClient.admin.getUser({
+    query: {
+      id,
+    },
+  });
+};
+
+export {
+  signIn,
+  signUp,
+  signOut,
+  useSession,
+  signInSocial,
+  getSession,
+  getUser,
+};

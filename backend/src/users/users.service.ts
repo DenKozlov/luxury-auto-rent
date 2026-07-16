@@ -3,21 +3,59 @@ import {
   Inject,
   Injectable,
   UnauthorizedException,
+  Logger,
 } from '@nestjs/common';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { S3Service } from '../storage/s3.service';
 import { UserSession } from '@thallesp/nestjs-better-auth';
 import { auth } from '@/lib/auth';
 import { Request } from 'express';
-import { AuthenticatedRequest } from '../common/types';
-import { ClientProxy } from '@nestjs/microservices';
+import { AuthenticatedRequest } from '../../common/types';
+import { PrismaService } from '../../prisma.service';
+import { publishEvent } from '@/lib/rabbit-connection';
+import { GetUsersDto } from './dto/get-users.dto';
 
 @Injectable()
 export class UsersService {
   constructor(
     @Inject(S3Service) private readonly s3Service: S3Service,
-    @Inject('NOTIFICATION_SERVICE') private readonly client: ClientProxy,
+    @Inject(PrismaService) private prisma: PrismaService,
   ) {}
+  private readonly logger = new Logger(UsersService.name);
+
+  async getUsers(req: Request, query: GetUsersDto) {
+    const {
+      search,
+      searchBy = 'name',
+      sortBy = 'name',
+      sortDirection = 'desc',
+      limit,
+      offset,
+    } = query;
+    return await auth.api.listUsers({
+      query: {
+        searchField: searchBy,
+        searchValue: search,
+        searchOperator: 'contains',
+        sortBy,
+        sortDirection,
+        limit,
+        offset,
+      },
+      //   searchValue: 'some name',
+      //   searchField: 'name',
+      //   searchOperator: 'contains',
+      //   limit: 100,
+      //   offset: 100,
+      //   sortBy: 'name',
+      //   sortDirection: 'desc',
+      //   filterField: 'email',
+      //   filterValue: 'hello@example.com',
+      //   filterOperator: 'eq',
+      // },
+      headers: { cookie: req.headers.cookie || '' },
+    });
+  }
 
   async update(
     req: Request,
@@ -69,11 +107,22 @@ export class UsersService {
       headers,
     });
 
-    this.client.emit('user_deactivated', {
+    await publishEvent('user_deactivated', {
       email: user.email,
       context: { reactivationDeadline: formattedDate, fullName: user.name },
     });
 
     return { success: true, formattedDate };
+  }
+
+  async updateLastLoginAt(userId: string, loginAt: Date) {
+    try {
+      return await this.prisma.user.update({
+        where: { id: userId },
+        data: { lastLoginAt: loginAt },
+      });
+    } catch (e) {
+      this.logger.error(`Failed to update lastLoginAt for user ${userId}`, e);
+    }
   }
 }

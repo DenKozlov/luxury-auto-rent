@@ -1,5 +1,5 @@
-import { Filters, PaginatedResult } from 'src/common/types';
-import { Car } from 'src/common/types';
+import { Filters, PaginatedResult } from '@/common/types';
+import { Car } from '@/common/types';
 import { CarQueryDto } from './dto/car-pagination.dto';
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';

@@ -9,6 +9,9 @@ import { UsersModule } from './users/users.module';
 import { TestingModule } from '../test/testing/testing.module';
 import { MailModule } from './mail/mail.module';
 import { SlackModule } from './slack/slack.module';
+import { InvitationsModule } from './invitations/invitations.module';
+import { APP_GUARD } from '@nestjs/core';
+import { PermissionsGuard } from '@/auth/guards/permissions.guard';
 
 @Module({
   imports: [
@@ -20,7 +23,14 @@ import { SlackModule } from './slack/slack.module';
     TestingModule,
     MailModule,
     SlackModule,
+    InvitationsModule,
   ],
   controllers: [AppController],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: PermissionsGuard,
+    },
+  ],
 })
 export class AppModule {}

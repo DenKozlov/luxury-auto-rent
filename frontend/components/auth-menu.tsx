@@ -51,13 +51,21 @@ const AuthMenu = () => {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="w-56" align="end">
-        <DropdownMenuLabel className="text-xs">My Account</DropdownMenuLabel>
+        <DropdownMenuLabel className="text-lg">
+          {session.user.name}
+        </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="cursor-pointer text-base">
           <Link className="w-full" href="/profile">
             My Profile
           </Link>
         </DropdownMenuItem>
+        <DropdownMenuItem className="cursor-pointer text-base">
+          <Link className="w-full" href="/dashboard">
+            Dashboard
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={async () => {
             await signOut();

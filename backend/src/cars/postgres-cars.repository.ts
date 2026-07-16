@@ -12,7 +12,7 @@ import { instanceToPlain } from 'class-transformer';
 import { Prisma } from '@/prisma/generated/client';
 import { CarQueryDto } from './dto/car-pagination.dto';
 import { buildCarQuery } from 'lib/query-builder';
-import { Car, Filters, PaginatedResult } from 'src/common/types';
+import { Car, Filters, PaginatedResult } from '@/common/types';
 
 @Injectable()
 export class PostgresCarsRepository extends CarsRepository {

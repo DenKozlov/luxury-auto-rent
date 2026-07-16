@@ -4,7 +4,7 @@ import { createTransport, Transporter, SentMessageInfo } from 'nodemailer';
 import handlebars from 'handlebars';
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { MailContext } from '../common/types';
+import { EmailSubject, MailContext, SendEamilParams } from '../../common/types';
 
 @Injectable()
 export class MailService {
@@ -16,7 +16,7 @@ export class MailService {
   >();
 
   private renderTemplate<T extends MailContext>(
-    templateName: string,
+    templateName: EmailSubject,
     context: T,
   ): string {
     if (!this.templateCache.has(templateName)) {
@@ -32,7 +32,7 @@ export class MailService {
     return template(context);
   }
 
-  private loadTemplateToCache(templateName: string): void {
+  private loadTemplateToCache(templateName: EmailSubject): void {
     const filePath = join(
       process.cwd(),
       'src/mail/templates',
@@ -55,12 +55,12 @@ export class MailService {
     });
   }
 
-  async sendMail<T extends MailContext>(
-    to: string,
-    subject: string,
-    templateName: string,
-    context: T,
-  ): Promise<SentMessageInfo> {
+  async sendMail<T extends MailContext>({
+    to,
+    subject,
+    templateName,
+    context,
+  }: SendEamilParams<T>): Promise<SentMessageInfo> {
     try {
       const html = this.renderTemplate(templateName, context);
 

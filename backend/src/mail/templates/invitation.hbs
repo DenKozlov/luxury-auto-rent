@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Invitation to join the team</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #000000;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Invitation to join Zenith</h2>
+        <p>Hello,</p>
+        
+        <p>Your email address has been added to the <strong>Zenith</strong> system. To get access to the corporate portal, please click the link below and create your account:</p>
+        
+        <center>
+            <a href="{{registrationUrl}}" class="button">Accept Invitation</a>
+        </center>
+        
+        <p>This link will be active for 7 days till <strong>{{invitationDeadline}}</strong>.</p>
+        
+        <p>If you were not expecting this email, please simply ignore it.</p>
+        
+        <p>Best regards,<br>The Zenith Team</p>
+    </div>
+</body>
+</html>
