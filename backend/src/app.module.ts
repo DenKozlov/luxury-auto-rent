@@ -7,6 +7,8 @@ import { AuthModule } from '@thallesp/nestjs-better-auth';
 import { auth } from '@/lib/auth';
 import { UsersModule } from './users/users.module';
 import { TestingModule } from '../test/testing/testing.module';
+import { MailModule } from './mail/mail.module';
+import { SlackModule } from './slack/slack.module';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { TestingModule } from '../test/testing/testing.module';
     AuthModule.forRoot({ auth }),
     UsersModule,
     TestingModule,
+    MailModule,
+    SlackModule,
   ],
   controllers: [AppController],
 })

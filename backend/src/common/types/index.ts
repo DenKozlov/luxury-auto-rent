@@ -59,3 +59,13 @@ export interface AuthenticatedRequest extends Request {
     user: User;
   };
 }
+export interface DeactivationContext {
+  fullName: string;
+  reactivationDeadline: string;
+}
+
+export interface WelcomeContext {
+  fullName: string;
+}
+
+export type MailContext = DeactivationContext | WelcomeContext;

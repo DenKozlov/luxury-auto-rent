@@ -16,6 +16,7 @@ import { ImagesModule } from 'src/images/images.module';
       provide: CarsRepository,
       useClass: PostgresCarsRepository,
     },
+    PostgresImagesRepository,
     {
       provide: ImagesRepository,
       useExisting: PostgresImagesRepository,

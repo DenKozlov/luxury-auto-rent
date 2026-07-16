@@ -10,10 +10,14 @@ import { UserSession } from '@thallesp/nestjs-better-auth';
 import { auth } from '@/lib/auth';
 import { Request } from 'express';
 import { AuthenticatedRequest } from '../common/types';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class UsersService {
-  constructor(@Inject(S3Service) private readonly s3Service: S3Service) {}
+  constructor(
+    @Inject(S3Service) private readonly s3Service: S3Service,
+    @Inject('NOTIFICATION_SERVICE') private readonly client: ClientProxy,
+  ) {}
 
   async update(
     req: Request,
@@ -45,10 +49,11 @@ export class UsersService {
     session: UserSession,
     id: string,
   ) {
+    const { user } = session;
     const headers = { cookie: req.headers.cookie || '' };
     const sessionToken = req.session.session.token;
 
-    if (id !== session.user.id) {
+    if (id !== user.id) {
       throw new ForbiddenException('You can only deactivate your own account');
     }
 
@@ -57,12 +62,18 @@ export class UsersService {
     }
 
     const deletedAt = new Date();
+    const formattedDate = new Date().toLocaleString('en-US');
 
     await auth.api.updateUser({
       body: { deletedAt },
       headers,
     });
 
-    return { success: true, deletedAt };
+    this.client.emit('user_deactivated', {
+      email: user.email,
+      context: { reactivationDeadline: formattedDate, fullName: user.name },
+    });
+
+    return { success: true, formattedDate };
   }
 }

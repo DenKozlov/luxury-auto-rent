@@ -13,8 +13,8 @@ export function DeactivateContainer({ id }: { id: string }) {
   const { mutate, isPending } = useMutation({
     mutationFn: () => usersService.deactivateAccount(id),
     onSuccess: async () => {
-      await signOut();
-      router.push("/");
+      // await signOut();
+      // router.push("/");
       toast.success("Account has been deactivated.", { position: "top-right" });
     },
   });

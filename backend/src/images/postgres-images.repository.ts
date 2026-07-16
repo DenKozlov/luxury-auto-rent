@@ -5,7 +5,7 @@ import { S3Service } from '../storage/s3.service';
 
 @Injectable()
 export class PostgresImagesRepository extends ImagesRepository {
-  constructor(@Inject(S3Service) private readonly s3Service: S3Service) {
+  constructor(private readonly s3Service: S3Service) {
     super();
   }
 
