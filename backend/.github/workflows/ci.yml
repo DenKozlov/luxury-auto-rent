@@ -1,0 +1,52 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    env:
+      DATABASE_URL: 'postgresql://admin:super_secret_password@localhost:5432/cars_database?schema=public'
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: super_secret_password
+          POSTGRES_DB: cars_database
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Wait for PostgreSQL
+        run: |
+          until pg_isready -h localhost -p 5432; do
+            sleep 2
+          done
+
+      - name: Run Prisma Migrations
+        run: npx prisma migrate deploy
+
+      - name: Run Unit & Integration Tests (with 60% Coverage check)
+        run: yarn test --coverage

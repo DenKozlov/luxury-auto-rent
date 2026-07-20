@@ -1,0 +1,138 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client"
+  output   = "./generated"
+}
+
+model Car {
+  id                String   @id @default(uuid()) 
+  brand             String
+  model             String
+  year              Int    
+  mileage_km        Int     
+  body_type         BodyType
+  engine            Json     
+  color             String
+  interior_material String
+  price_per_day_pln Int    
+  is_available      Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  images            CarImage[]
+  rating            Float      @default(5.0)
+}
+
+model CarImage {
+  id                String @id @default(uuid())
+  url               String
+  carId             String
+  car               Car    @relation(fields: [carId], references: [id], onDelete: Cascade)
+
+  @@index([carId])
+}
+
+model User {
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+  deletedAt     DateTime?
+  role       String?   @default("user")
+  banned     Boolean?  @default(false)
+  banReason  String?
+  banExpires DateTime?
+  lastLoginMethod String?
+  lastLoginAt   DateTime?
+  status    UserStatus @default(ACTIVE)
+
+  @@unique([email, deletedAt], name: "unique_active_email")
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  impersonatedBy String?
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+model Invitation {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  status    InvitationStatus @default(PENDING)
+  invitedBy String 
+  role      String   @default("user")
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  acceptedAt DateTime?
+}
+
+enum BodyType {
+  SEDAN
+  SUV
+  HATCHBACK
+  COUPE
+  CONVERTIBLE
+}
+
+enum UserStatus {
+  ACTIVE
+  DEACTIVATED
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  REVOKED
+  EXPIRED
+}
