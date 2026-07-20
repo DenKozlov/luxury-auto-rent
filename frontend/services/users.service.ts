@@ -7,8 +7,16 @@ export const usersService = {
     const { data } = await api.patch<User>("/users/me", formData);
     return data;
   },
-  deactivateAccount: async (id: string): Promise<User> => {
+  deactivateMe: async (): Promise<User> => {
+    const { data } = await api.patch<User>("/users/me/deactivate");
+    return data;
+  },
+  deactivateUser: async (id: string): Promise<{ user: User }> => {
     const { data } = await api.post(`/users/${id}/deactivate`);
+    return data;
+  },
+  reactivateUser: async (id: string): Promise<{ user: User }> => {
+    const { data } = await api.patch(`/users/${id}/reactivate`);
     return data;
   },
   getUsers: async ({
@@ -17,7 +25,6 @@ export const usersService = {
     sorting,
     pagination,
   }: ListUsersParams): Promise<ListUsersResponse> => {
-    console.log(pagination);
     const sort = sorting[0];
     const params = {
       offset: pagination.pageIndex * pagination.pageSize,

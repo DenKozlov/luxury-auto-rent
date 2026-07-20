@@ -1,15 +1,20 @@
 import { createAuthClient, SuccessContext } from "better-auth/react";
 import { adminClient } from "better-auth/client/plugins";
-import { ac, admin } from "@/lib/actions/permissions";
+import { ac, admin, superAdmin, user } from "@/lib/actions/permissions";
 
 export const authClient = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL || "http://localhost:3001",
   plugins: [
     adminClient({
       ac,
-      roles: { admin },
+      roles: { admin, superAdmin, user },
     }),
   ],
+  fetchOptions: {
+    query: {
+      staleTime: 3 * 60 * 1000,
+    },
+  },
 });
 
 const { useSession, getSession } = authClient;

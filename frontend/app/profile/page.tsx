@@ -37,7 +37,7 @@ export default async function ProfilePage() {
           </div>
         </div>
         <ProfileEditDialog user={user} />
-        <DeactivateContainer id={user.id} />
+        <DeactivateContainer />
       </div>
     </div>
   );

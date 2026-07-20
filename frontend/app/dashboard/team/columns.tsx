@@ -2,8 +2,16 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { ExtendedUser } from "@/types";
 import DataTableColumnHeader from "@/components/data-table-column-header";
+import ActionButton from "@/components/action-button";
 
-export const columns: ColumnDef<ExtendedUser>[] = [
+export const getColumns = (
+  actionHandlers: {
+    onDeactivate: (user: ExtendedUser) => void;
+    onActivate: (user: ExtendedUser) => void;
+  },
+  isLoading: boolean,
+  canDeactivateAdmin: boolean,
+): ColumnDef<ExtendedUser>[] => [
   {
     accessorKey: "name",
     header: ({ column }) => (
@@ -24,7 +32,7 @@ export const columns: ColumnDef<ExtendedUser>[] = [
   },
   {
     accessorKey: "status",
-    header: "Status",
+    header: () => <span className="font-bold">Status</span>,
     cell: ({ row }) => {
       const status = row.original.status;
       const clnms =
@@ -36,14 +44,14 @@ export const columns: ColumnDef<ExtendedUser>[] = [
   },
   {
     accessorKey: "createdAt",
-    header: "Joined",
+    header: () => <span className="font-bold">Joined</span>,
     cell: ({ row }) => (
       <span>{new Date(row.original.createdAt).toLocaleDateString()}</span>
     ),
   },
   {
     accessorKey: "lastLoginAt",
-    header: "Last active",
+    header: () => <span className="font-bold">Last active</span>,
     cell: ({ row }) => {
       if (!row.original.lastLoginAt) {
         return "-";
@@ -53,23 +61,34 @@ export const columns: ColumnDef<ExtendedUser>[] = [
       );
     },
   },
-  // {
-  //   id: "actions",
-  //   cell: ({ row }) => (
-  //     <div className="flex gap-2">
-  //       <Button variant="ghost" size="icon">
-  //         <Mail className="h-4 w-4" />
-  //       </Button>
-  //       {row.original.status === "active" ? (
-  //         <Button variant="ghost" size="icon">
-  //           <Ban className="h-4 w-4" />
-  //         </Button>
-  //       ) : (
-  //         <Button variant="ghost" size="icon">
-  //           <CheckCircle className="h-4 w-4" />
-  //         </Button>
-  //       )}
-  //     </div>
-  //   ),
-  // },
+  {
+    id: "actions",
+    cell: ({ row }) => {
+      const user = row.original;
+      const isDisabled = !canDeactivateAdmin && user.role === "admin";
+      const isActive = user.status === "ACTIVE";
+      return (
+        <ActionButton
+          isDisabled={isDisabled}
+          isLoading={isLoading}
+          {...(isActive && { variant: "destructive" })}
+          actions={
+            isActive
+              ? [
+                  {
+                    action: "Deactivate",
+                    handler: () => actionHandlers.onDeactivate(user),
+                  },
+                ]
+              : [
+                  {
+                    action: "Activate",
+                    handler: () => actionHandlers.onActivate(user),
+                  },
+                ]
+          }
+        />
+      );
+    },
+  },
 ];

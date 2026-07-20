@@ -4,7 +4,7 @@ import { createAuthMiddleware, APIError } from 'better-auth/api';
 import { prisma } from './prisma';
 import { admin as adminPlugin, lastLoginMethod } from 'better-auth/plugins';
 import { publishEvent } from './rabbit-connection';
-import { ac, admin } from '@/lib/permissions';
+import { ac, admin, superAdmin } from '@/lib/permissions';
 
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL,
@@ -16,7 +16,7 @@ export const auth = betterAuth({
     adminPlugin({
       ac,
       defaultRole: 'user',
-      roles: { admin },
+      roles: { admin, superAdmin },
     }),
     lastLoginMethod({
       storeInDatabase: true,

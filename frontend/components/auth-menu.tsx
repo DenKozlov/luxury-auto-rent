@@ -14,9 +14,14 @@ import Link from "next/link";
 import { Button } from "./ui/button";
 import { UserRound } from "lucide-react";
 import { redirect } from "next/navigation";
+import useHaveAccess from "@/hooks/use-have-access";
 
 const AuthMenu = () => {
   const { data: session, isPending } = useSession();
+  const { hasPermissions } = useHaveAccess({
+    employee: ["list"],
+    invitation: ["list"],
+  });
 
   if (isPending) return null;
 
@@ -30,6 +35,10 @@ const AuthMenu = () => {
       </Link>
     );
   }
+
+  const dashboardHref = hasPermissions
+    ? "/dashboard/team"
+    : "/dashboard/clients";
 
   return (
     <DropdownMenu modal={false}>
@@ -61,7 +70,7 @@ const AuthMenu = () => {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem className="cursor-pointer text-base">
-          <Link className="w-full" href="/dashboard">
+          <Link className="w-full" href={dashboardHref}>
             Dashboard
           </Link>
         </DropdownMenuItem>

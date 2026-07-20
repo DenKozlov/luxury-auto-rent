@@ -1,4 +1,4 @@
-import { IsOptional, IsInt, IsString } from 'class-validator';
+import { IsOptional, IsInt, IsString, IsNumber } from 'class-validator';
 
 export class GetUsersDto {
   @IsOptional()
@@ -24,4 +24,8 @@ export class GetUsersDto {
   @IsOptional()
   @IsString()
   sortDirection?: string;
+
+  @IsOptional()
+  @IsNumber()
+  offset?: number;
 }

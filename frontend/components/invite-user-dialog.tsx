@@ -29,11 +29,6 @@ import {
 } from "react-hook-form";
 import { Dispatch, SetStateAction } from "react";
 
-const items = [
-  { label: "Admin", value: "admin" },
-  { label: "User", value: "user" },
-];
-
 interface InviteUserDialogProps {
   isPending: boolean;
   isInviting: boolean;
@@ -43,6 +38,10 @@ interface InviteUserDialogProps {
   control: Control<InviteFormValues, unknown, InviteFormValues>;
   handleSubmit: UseFormHandleSubmit<InviteFormValues, InviteFormValues>;
   errors: FieldErrors<InviteFormValues>;
+  roles: {
+    label: string;
+    value: string;
+  }[];
 }
 
 const InviteUserDialog = ({
@@ -54,6 +53,7 @@ const InviteUserDialog = ({
   control,
   handleSubmit,
   errors,
+  roles,
 }: InviteUserDialogProps) => {
   const onSubmit = (values: InviteFormValues) => {
     mutate(values);
@@ -103,14 +103,15 @@ const InviteUserDialog = ({
                   <Select
                     defaultValue={field.value}
                     onValueChange={field.onChange}
+                    disabled={roles.length < 2}
                   >
                     <SelectTrigger className="w-full max-w-48">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {items.map((item) => (
-                        <SelectItem key={item.value} value={item.value}>
-                          {item.label}
+                      {roles.map((role) => (
+                        <SelectItem key={role.value} value={role.value}>
+                          {role.label}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -125,6 +126,7 @@ const InviteUserDialog = ({
                 </Button>
               </DialogClose>
               <ButtonWithSpinner
+                type="submit"
                 isLoading={isPending}
                 label="Send invitation"
               />

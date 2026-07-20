@@ -20,6 +20,18 @@ export class MailController {
     });
   }
 
+  @EventPattern('user_reactivated')
+  async handleUserReactivated(
+    @Payload() data: { email: string; context: DeactivationContext },
+  ) {
+    await this.mailService.sendMail({
+      to: data.email,
+      subject: 'Account Reactivation Notice',
+      templateName: EmailSubjectEnum.Reactivation,
+      context: data.context,
+    });
+  }
+
   @EventPattern('user_invited')
   async handleUserInvited(
     @Payload() data: { email: string; context: DeactivationContext },

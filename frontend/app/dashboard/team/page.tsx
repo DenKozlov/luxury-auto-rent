@@ -1,8 +1,14 @@
 "use client";
-import { ChangeEvent, useMemo, useState } from "react";
+
+import { useCallback, useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { columns } from "./columns";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { getColumns } from "./columns";
 import { usersService } from "@/services/users.service";
 import InviteUserContainer from "@/components/invite-user-container";
 import DataTable from "@/components/data-table";
@@ -14,8 +20,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useDebouncedValue } from "@tanstack/react-pacer";
-// import { SortState } from "@/types";
 import { PaginationState, SortingState } from "@tanstack/react-table";
+import { ExtendedUser } from "@/types";
+import { toast } from "sonner";
+import useHaveAccess from "@/hooks/use-have-access";
 
 const items = [
   { label: "Name", value: "name" },
@@ -30,27 +38,67 @@ export default function Team() {
     pageIndex: 0,
     pageSize: 10,
   });
+  const queryClient = useQueryClient();
 
   const [debouncedSearch] = useDebouncedValue(search, {
     wait: 500,
   });
 
-  const { data, isLoading, isFetching, isError } = useQuery({
+  const { data, isFetching, isError } = useQuery({
     queryKey: ["users", debouncedSearch, searchBy, sorting, pagination],
     queryFn: () =>
       usersService.getUsers({ debouncedSearch, searchBy, sorting, pagination }),
     placeholderData: keepPreviousData,
   });
 
-  // const handleSortingChange = (p) => {
-  //   const result = p();
-  //   console.log(result);
-  // };
+  const { mutate, isPending } = useMutation({
+    mutationFn: (id: string) => usersService.deactivateUser(id),
+    onSuccess: async (response) => {
+      toast.success(`Account for ${response.user.name} has been deactivated.`, {
+        position: "top-right",
+      });
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
+  });
 
-  // listUsers из better-auth возвращает { users, total, limit, offset },
-  // поэтому реальный массив лежит в data.users, а не в самом data
+  const { mutate: reactivateMutation, isPending: isPendingreactivation } =
+    useMutation({
+      mutationFn: (id: string) => usersService.reactivateUser(id),
+      onSuccess: async (response) => {
+        toast.success(
+          `Account for ${response.user.name} has been reactivated.`,
+          {
+            position: "top-right",
+          },
+        );
+        queryClient.invalidateQueries({ queryKey: ["users"] });
+      },
+    });
+
+  const onDeactivate = useCallback(
+    (user: ExtendedUser) => {
+      mutate(user.id);
+    },
+    [mutate],
+  );
+  const onActivate = useCallback(
+    (user: ExtendedUser) => {
+      reactivateMutation(user.id);
+    },
+    [reactivateMutation],
+  );
+
+  const isLoading = isPending || isPendingreactivation;
+  const { hasPermissions } = useHaveAccess({
+    employee: ["deactivate-admin"],
+  });
+
   const users = useMemo(() => data?.users ?? [], [data]);
   const total = useMemo(() => data?.total ?? 0, [data]);
+  const columns = useMemo(
+    () => getColumns({ onDeactivate, onActivate }, isLoading, hasPermissions),
+    [hasPermissions, isLoading, onActivate, onDeactivate],
+  );
 
   return (
     <div className="space-y-4 mt-16">
@@ -60,10 +108,6 @@ export default function Team() {
             placeholder="Search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            // value={table.getColumn("email")?.getFilterValue() ?? ""}
-            // onChange={(e) =>
-            //   table.getColumn("email")?.setFilterValue(e.target.value)
-            // }
             type="search"
             className="w-72 mb-0"
           />
@@ -87,7 +131,7 @@ export default function Team() {
       </div>
       <DataTable
         isError={isError}
-        isLoading={isLoading || isFetching}
+        isLoading={isFetching}
         data={users}
         columns={columns}
         sorting={sorting}

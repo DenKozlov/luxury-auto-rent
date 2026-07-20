@@ -60,6 +60,7 @@ export interface Option {
 export interface ExtendedUser extends User {
   status: "ACTIVE" | "DEACTIVATED";
   lastLoginAt: string;
+  role: string;
 }
 
 export interface ListUsersResponse {

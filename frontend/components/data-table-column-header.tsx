@@ -16,7 +16,7 @@ const DataTableColumnHeader = <TData, TValue>({
   const Icon = isAsc ? ArrowDown : ArrowUp;
   return (
     <Button
-      className="cursor-pointer"
+      className="cursor-pointer font-bold"
       variant="ghost"
       onClick={column.getToggleSortingHandler()}
     >

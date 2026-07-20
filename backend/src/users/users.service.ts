@@ -1,10 +1,4 @@
-import {
-  ForbiddenException,
-  Inject,
-  Injectable,
-  UnauthorizedException,
-  Logger,
-} from '@nestjs/common';
+import { ForbiddenException, Inject, Injectable, Logger } from '@nestjs/common';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { S3Service } from '../storage/s3.service';
 import { UserSession } from '@thallesp/nestjs-better-auth';
@@ -14,6 +8,7 @@ import { AuthenticatedRequest } from '../../common/types';
 import { PrismaService } from '../../prisma.service';
 import { publishEvent } from '@/lib/rabbit-connection';
 import { GetUsersDto } from './dto/get-users.dto';
+import { type User } from 'better-auth';
 
 @Injectable()
 export class UsersService {
@@ -41,18 +36,10 @@ export class UsersService {
         sortDirection,
         limit,
         offset,
+        filterField: 'role',
+        filterValue: 'superAdmin',
+        filterOperator: 'ne',
       },
-      //   searchValue: 'some name',
-      //   searchField: 'name',
-      //   searchOperator: 'contains',
-      //   limit: 100,
-      //   offset: 100,
-      //   sortBy: 'name',
-      //   sortDirection: 'desc',
-      //   filterField: 'email',
-      //   filterValue: 'hello@example.com',
-      //   filterOperator: 'eq',
-      // },
       headers: { cookie: req.headers.cookie || '' },
     });
   }
@@ -82,28 +69,14 @@ export class UsersService {
     });
   }
 
-  async softDelete(
-    req: AuthenticatedRequest,
-    session: UserSession,
-    id: string,
-  ) {
-    const { user } = session;
+  async softDeleteMe(req: AuthenticatedRequest, user: User) {
     const headers = { cookie: req.headers.cookie || '' };
-    const sessionToken = req.session.session.token;
-
-    if (id !== user.id) {
-      throw new ForbiddenException('You can only deactivate your own account');
-    }
-
-    if (!sessionToken) {
-      throw new UnauthorizedException('Session token not found');
-    }
 
     const deletedAt = new Date();
     const formattedDate = new Date().toLocaleString('en-US');
 
     await auth.api.updateUser({
-      body: { deletedAt },
+      body: { deletedAt, status: 'DEACTIVATED' },
       headers,
     });
 
@@ -113,6 +86,75 @@ export class UsersService {
     });
 
     return { success: true, formattedDate };
+  }
+
+  async softDeleteUser(req: AuthenticatedRequest, id: string) {
+    const headers = { cookie: req.headers.cookie || '' };
+
+    const user = await auth.api.getUser({
+      query: {
+        id,
+      },
+      headers,
+    });
+
+    if (user.role === 'admin') {
+      const { success } = await auth.api.userHasPermission({
+        body: {
+          userId: user.id,
+          permissions: { employee: ['deactivate-admin'] },
+        },
+      });
+
+      if (success) {
+        throw new ForbiddenException('Only superAdmin can deactivate admins');
+      }
+    }
+
+    const deletedAt = new Date();
+    const formattedDate = new Date().toLocaleString('en-US');
+
+    const updatedUser = await auth.api.adminUpdateUser({
+      body: { userId: id, data: { deletedAt, status: 'DEACTIVATED' } },
+      headers,
+    });
+
+    await auth.api.revokeUserSessions({
+      body: {
+        userId: id,
+      },
+      headers,
+    });
+
+    await publishEvent('user_deactivated', {
+      email: user.email,
+      context: { reactivationDeadline: formattedDate, fullName: user.name },
+    });
+
+    return { success: true, user: updatedUser };
+  }
+
+  async activate(req: AuthenticatedRequest, id: string) {
+    const headers = { cookie: req.headers.cookie || '' };
+
+    const user = await auth.api.getUser({
+      query: {
+        id,
+      },
+      headers,
+    });
+
+    const updatedUser = await auth.api.adminUpdateUser({
+      body: { userId: id, data: { deletedAt: null, status: 'ACTIVE' } },
+      headers,
+    });
+
+    await publishEvent('user_reactivated', {
+      email: user.email,
+      context: { fullName: user.name },
+    });
+
+    return { success: true, user: updatedUser };
   }
 
   async updateLastLoginAt(userId: string, loginAt: Date) {

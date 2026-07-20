@@ -1,13 +1,20 @@
 import { Button } from "./ui/button";
 import { Spinner } from "./ui/spinner";
 
-interface ButtonWithSpinnerProps {
+type ButtonProps = React.ComponentProps<typeof Button>;
+interface ButtonWithSpinnerProps extends ButtonProps {
   isLoading: boolean;
   label: string;
 }
 
-const ButtonWithSpinner = ({ isLoading, label }: ButtonWithSpinnerProps) => (
-  <Button type="submit" className="gap-2">
+const ButtonWithSpinner = ({
+  isLoading,
+  label,
+  type,
+  variant,
+  ...rest
+}: ButtonWithSpinnerProps) => (
+  <Button type={type} variant={variant} className="gap-2" {...rest}>
     {isLoading && <Spinner />} {label}
   </Button>
 );
