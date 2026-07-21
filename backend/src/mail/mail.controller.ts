@@ -32,8 +32,8 @@ export class MailController {
     });
   }
 
-  @EventPattern('user_invited')
-  async handleUserInvited(
+  @EventPattern('invitation_sent')
+  async handleInvitationSend(
     @Payload() data: { email: string; context: DeactivationContext },
   ) {
     await this.mailService.sendMail({
@@ -41,6 +41,27 @@ export class MailController {
       subject: 'Invitation Notice',
       templateName: EmailSubjectEnum.Invitation,
       context: data.context,
+    });
+  }
+
+  @EventPattern('invitation_resent')
+  async handleInvitationResend(
+    @Payload() data: { email: string; context: DeactivationContext },
+  ) {
+    await this.mailService.sendMail({
+      to: data.email,
+      subject: 'Invitation Notice',
+      templateName: EmailSubjectEnum.Resend,
+      context: data.context,
+    });
+  }
+
+  @EventPattern('invitation_revoked')
+  async handleInvitationRevoked(@Payload() data: { email: string }) {
+    await this.mailService.sendMail({
+      to: data.email,
+      subject: 'Invitation Revoked',
+      templateName: EmailSubjectEnum.Revoke,
     });
   }
 }

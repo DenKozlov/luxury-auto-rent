@@ -17,7 +17,7 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 import { Session } from '@thallesp/nestjs-better-auth';
 import type { UserSession } from '@thallesp/nestjs-better-auth';
 import express from 'express';
-import * as types from '../../common/types';
+import { type AuthenticatedRequest } from '../../common/types';
 import { EventPattern, Payload } from '@nestjs/microservices';
 import { GetUsersDto } from './dto/get-users.dto';
 import { CurrentUser } from '@/auth/decorators/user.decorator';
@@ -50,7 +50,7 @@ export class UsersController {
 
   @Post('me/deactivate')
   async deactivate(
-    @Req() req: types.AuthenticatedRequest,
+    @Req() req: AuthenticatedRequest,
     @CurrentUser() user: User,
   ) {
     return await this.usersService.softDeleteMe(req, user);
@@ -59,7 +59,7 @@ export class UsersController {
   @Post(':id/deactivate')
   @RequirePermission('employee', 'deactivate')
   async deactivateUser(
-    @Req() req: types.AuthenticatedRequest,
+    @Req() req: AuthenticatedRequest,
     @Param('id') id: string,
   ) {
     return await this.usersService.softDeleteUser(req, id);
@@ -67,7 +67,7 @@ export class UsersController {
 
   @Patch(':id/reactivate')
   async activateUser(
-    @Req() req: types.AuthenticatedRequest,
+    @Req() req: AuthenticatedRequest,
     @Param('id') id: string,
   ) {
     return await this.usersService.activate(req, id);

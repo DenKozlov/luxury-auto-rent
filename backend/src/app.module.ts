@@ -12,6 +12,7 @@ import { SlackModule } from './slack/slack.module';
 import { InvitationsModule } from './invitations/invitations.module';
 import { APP_GUARD } from '@nestjs/core';
 import { PermissionsGuard } from '@/auth/guards/permissions.guard';
+import { SharedModule } from './shared/shared.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { PermissionsGuard } from '@/auth/guards/permissions.guard';
     MailModule,
     SlackModule,
     InvitationsModule,
+    SharedModule,
   ],
   controllers: [AppController],
   providers: [

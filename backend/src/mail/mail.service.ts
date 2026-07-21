@@ -17,7 +17,7 @@ export class MailService {
 
   private renderTemplate<T extends MailContext>(
     templateName: EmailSubject,
-    context: T,
+    context?: T,
   ): string {
     if (!this.templateCache.has(templateName)) {
       this.loadTemplateToCache(templateName);

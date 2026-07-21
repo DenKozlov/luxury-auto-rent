@@ -6,18 +6,23 @@ import {
   Controller,
   Post,
   Inject,
-  Req,
   Res,
+  ParseIntPipe,
+  Param,
+  Patch,
 } from '@nestjs/common';
 import {
   AllowAnonymous,
   Session,
   type UserSession,
 } from '@thallesp/nestjs-better-auth';
-import { InvitationsService } from './invitations.service';
-import { CreateInvitationDto } from './dto/create-invitation.dto';
-import { AcceptInvitationDto } from './dto/accept-invitation.dto';
-import { type Request, type Response } from 'express';
+import { InvitationsService } from '@/src/invitations/invitations.service';
+import { CreateInvitationDto } from '@/src/invitations/dto/create-invitation.dto';
+import { AcceptInvitationDto } from '@/src/invitations/dto/accept-invitation.dto';
+import { type Response } from 'express';
+import { GetInvitationsDto } from '@/src/invitations/dto/get-invitations.dto';
+import { CurrentUser } from '@/auth/decorators/user.decorator';
+import { type User } from 'better-auth';
 
 @Controller('invitations')
 export class InvitationsController {
@@ -41,32 +46,40 @@ export class InvitationsController {
     return await this.invitationsService.validateInvitation(token);
   }
 
-  //   @Get()
-  //   @RequirePermission('invitation', 'list')
-  //   async list() {
-  //     return this.invitationsService.listPendingInvitations();
-  //   }
+  @Get()
+  @RequirePermission('invitation', 'list')
+  async get(
+    @Query() rawDto: GetInvitationsDto,
+    @Query('page', ParseIntPipe) page: number,
+    @Query('limit', ParseIntPipe) limit: number,
+  ) {
+    const dto = {
+      ...rawDto,
+      page,
+      limit,
+    };
+    return this.invitationsService.getInvitations(dto);
+  }
 
-  //   @Post(':id/resend')
-  //   @RequirePermission('invitation', 'resend')
-  //   async resend(@Param('id') id: string) {
-  //     return this.invitationsService.resendInvitation(id);
-  //   }
+  @Patch(':id/resend')
+  @RequirePermission('invitation', 'resend')
+  async resend(@Param('id') id: string, @CurrentUser() user: User) {
+    return this.invitationsService.resendInvitation(id, user);
+  }
 
-  //   @Post(':id/revoke')
-  //   @RequirePermission('invitation', 'revoke')
-  //   async revoke(@Param('id') id: string) {
-  //     return this.invitationsService.revokeInvitation(id);
-  //   }
+  @Patch(':id/revoke')
+  @RequirePermission('invitation', 'revoke')
+  async revoke(@Param('id') id: string, @CurrentUser() user: User) {
+    return this.invitationsService.revokeInvitation(id, user);
+  }
 
   @Post('accept')
   @AllowAnonymous()
   async accept(
     @Body() dto: AcceptInvitationDto,
-    @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const result = await this.invitationsService.acceptInvitation(dto, req);
+    const result = await this.invitationsService.acceptInvitation(dto);
 
     if (result.setCookie?.length) {
       res.setHeader('Set-Cookie', result.setCookie);

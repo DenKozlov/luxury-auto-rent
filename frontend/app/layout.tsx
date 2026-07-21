@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/providers";
-import Script from "next/script";
+// import Script from "next/script";
 import Header from "@/components/header";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -34,12 +34,12 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <Header />
         <Providers>{children}</Providers>
-        <Script
+        {/* <Script
           src="https://app.fastbots.ai/embed.js"
           data-bot-id="cmqgllhu10arxnt1pbl5wvbuf"
           strategy="beforeInteractive"
-        />
-        <Toaster />
+        /> */}
+        <Toaster position="top-right" />
       </body>
     </html>
   );

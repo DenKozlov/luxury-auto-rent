@@ -12,7 +12,7 @@ import useHaveAccess from "@/hooks/use-have-access";
 
 const InviteUserContainer = () => {
   const [isInviting, setIsInviting] = useState(false);
-  const {hasPermissions} = useHaveAccess({ invitation: ["send-admin"] });
+  const { hasPermissions } = useHaveAccess({ invitation: ["send-admin"] });
   const roles = useMemo(
     () => [
       ...(hasPermissions ? [{ label: "Admin", value: "admin" }] : []),
@@ -33,12 +33,10 @@ const InviteUserContainer = () => {
   const { mutate, isPending } = useMutation({
     mutationFn: (values: InviteFormValues) => invitationsService.send(values),
     onSuccess: async () => {
-      toast.success("User invitaion has been sent", { position: "top-right" });
+      toast.success("User invitaion has been sent");
     },
     onError: async () => {
-      toast.error("User invitation flow failed. Please try again", {
-        position: "top-right",
-      });
+      toast.error("User invitation flow failed. Please try again");
     },
   });
 

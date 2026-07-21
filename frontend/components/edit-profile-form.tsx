@@ -53,13 +53,11 @@ export function ProfileEditDialog({ user }: { user: User }) {
         formData.append("file", values.image);
       }
       await usersService.updateMe(formData);
-      toast.success("Profile has been updated", { position: "top-right" });
+      toast.success("Profile has been updated");
       router.refresh();
       setIsEditing(false);
     } catch (error) {
-      toast.error("Profile update failed. Please try again", {
-        position: "top-right",
-      });
+      toast.error("Profile update failed. Please try again");
       console.error(error);
     }
   };
