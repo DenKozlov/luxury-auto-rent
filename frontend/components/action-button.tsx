@@ -13,16 +13,18 @@ import ButtonWithSpinner from "./button-with-spinner";
 
 type ButtonVariantType = VariantProps<typeof buttonVariants>["variant"];
 interface ActionButtonProps {
-  actions: { action: string; handler: MouseEventHandler<HTMLButtonElement> }[];
+  actions: {
+    action: string;
+    handler: MouseEventHandler<HTMLButtonElement>;
+    isLoading: boolean;
+  }[];
   variant?: ButtonVariantType;
-  isLoading: boolean;
   isDisabled: boolean;
 }
 
 const ActionButton = ({
   actions,
   variant = "ghost",
-  isLoading,
   isDisabled,
 }: ActionButtonProps) => {
   return (
@@ -38,7 +40,7 @@ const ActionButton = ({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-36" align="end">
-        {actions.map(({ action, handler }) => (
+        {actions.map(({ action, handler, isLoading }) => (
           <DropdownMenuItem key={action} className="text-base p-0">
             <ButtonWithSpinner
               className="w-full cursor-pointer"

@@ -3,8 +3,22 @@ import { adminAc, defaultStatements } from 'better-auth/plugins/admin/access';
 
 const statement = {
   ...defaultStatements,
-  invitation: ['list', 'send', 'revoke', 'resend', 'send-admin'],
-  employee: ['list', 'activate', 'deactivate', 'deactivate-admin'],
+  invitation: [
+    'list',
+    'send',
+    'revoke',
+    'resend',
+    'send-admin',
+    'revoke-admin',
+    'resend-admin',
+  ],
+  employee: [
+    'list',
+    'activate',
+    'deactivate',
+    'deactivate-admin',
+    'reactivate-admin',
+  ],
 } as const;
 
 export const ac = createAccessControl(statement);
@@ -16,7 +30,16 @@ export const admin = ac.newRole({
 });
 
 export const superAdmin = ac.newRole({
-  invitation: [...admin.statements.invitation, 'send-admin'],
-  employee: [...admin.statements.employee, 'deactivate-admin'],
+  invitation: [
+    ...admin.statements.invitation,
+    'send-admin',
+    'revoke-admin',
+    'resend-admin',
+  ],
+  employee: [
+    ...admin.statements.employee,
+    'deactivate-admin',
+    'reactivate-admin',
+  ],
   ...adminAc.statements,
 });

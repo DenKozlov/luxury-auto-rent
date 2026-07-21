@@ -51,6 +51,7 @@ model User {
   lastLoginMethod String?
   lastLoginAt   DateTime?
   status    UserStatus @default(ACTIVE)
+  invitations Invitation[]
 
   @@unique([email, deletedAt], name: "unique_active_email")
   @@map("user")
@@ -108,9 +109,10 @@ model Verification {
 model Invitation {
   id        String   @id @default(cuid())
   email     String
-  token     String   @unique
+  token     String?   @unique
   status    InvitationStatus @default(PENDING)
   invitedBy String 
+  user      User             @relation(fields: [invitedBy], references: [id])
   role      String   @default("user")
   expiresAt DateTime
   createdAt DateTime @default(now())

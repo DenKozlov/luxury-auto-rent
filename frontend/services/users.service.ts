@@ -1,5 +1,6 @@
 import { api } from "@/lib/axios";
-import { ListUsersParams, ListUsersResponse } from "@/types";
+import { getParams } from "@/lib/utils";
+import { GetParams, ListUsersResponse } from "@/types";
 import { User } from "better-auth";
 
 export const usersService = {
@@ -19,25 +20,8 @@ export const usersService = {
     const { data } = await api.patch(`/users/${id}/reactivate`);
     return data;
   },
-  getUsers: async ({
-    debouncedSearch,
-    searchBy,
-    sorting,
-    pagination,
-  }: ListUsersParams): Promise<ListUsersResponse> => {
-    const sort = sorting[0];
-    const params = {
-      offset: pagination.pageIndex * pagination.pageSize,
-      limit: pagination.pageSize,
-      sortBy: sort?.id,
-      sortDirection: sort ? (sort.desc ? "desc" : "asc") : undefined,
-      ...(!!debouncedSearch
-        ? {
-            search: debouncedSearch,
-            searchBy,
-          }
-        : {}),
-    };
+  getUsers: async (rawParams: GetParams): Promise<ListUsersResponse> => {
+    const params = getParams(rawParams);
     const { data } = await api.get<ListUsersResponse>("/users", {
       params,
     });

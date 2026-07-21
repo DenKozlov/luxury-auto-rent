@@ -15,7 +15,7 @@ export class GetUsersDto {
 
   @IsOptional()
   @IsString()
-  searchBy?: string;
+  searchBy?: 'email' | 'name';
 
   @IsOptional()
   @IsString()
@@ -23,7 +23,7 @@ export class GetUsersDto {
 
   @IsOptional()
   @IsString()
-  sortDirection?: string;
+  sortDirection?: 'asc' | 'desc';
 
   @IsOptional()
   @IsNumber()

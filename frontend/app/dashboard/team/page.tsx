@@ -54,9 +54,7 @@ export default function Team() {
   const { mutate, isPending } = useMutation({
     mutationFn: (id: string) => usersService.deactivateUser(id),
     onSuccess: async (response) => {
-      toast.success(`Account for ${response.user.name} has been deactivated.`, {
-        position: "top-right",
-      });
+      toast.success(`Account for ${response.user.name} has been deactivated.`);
       queryClient.invalidateQueries({ queryKey: ["users"] });
     },
   });
@@ -67,9 +65,6 @@ export default function Team() {
       onSuccess: async (response) => {
         toast.success(
           `Account for ${response.user.name} has been reactivated.`,
-          {
-            position: "top-right",
-          },
         );
         queryClient.invalidateQueries({ queryKey: ["users"] });
       },

@@ -11,4 +11,6 @@ export enum EmailSubjectEnum {
   Deactivation = 'deactivation',
   Reactivation = 'reactivation',
   Invitation = 'invitation',
+  Resend = 'invitation-resend',
+  Revoke = 'invitation-revoke',
 }

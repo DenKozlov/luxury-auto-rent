@@ -77,5 +77,5 @@ export type SendEamilParams<T> = {
   to: string;
   subject: string;
   templateName: EmailSubject;
-  context: T;
+  context?: T;
 };

@@ -15,7 +15,7 @@ export function DeactivateContainer() {
     onSuccess: async () => {
       await signOut();
       router.push("/");
-      toast.success("Account has been deactivated.", { position: "top-right" });
+      toast.success("Account has been deactivated.");
     },
   });
 

@@ -70,7 +70,7 @@ export interface ListUsersResponse {
   offset?: number;
 }
 
-export interface ListUsersParams {
+export interface GetParams {
   searchBy: string;
   debouncedSearch: string;
   sorting: SortingState;
@@ -80,4 +80,17 @@ export interface ListUsersParams {
 export interface Invitation {
   id: string;
   invitedBy: string;
+  createdAt: string;
+  acceptedAt: string;
+  expiresAt: string;
+  status: string;
+  role: string;
+  email: string;
+}
+
+export interface ListInvitationsResponse {
+  invitations: Invitation[];
+  hasMore: boolean;
+  page: number;
+  totalItems: number;
 }
