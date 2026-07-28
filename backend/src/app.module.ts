@@ -13,6 +13,9 @@ import { InvitationsModule } from './invitations/invitations.module';
 import { APP_GUARD } from '@nestjs/core';
 import { PermissionsGuard } from '@/auth/guards/permissions.guard';
 import { SharedModule } from './shared/shared.module';
+import { RentalsModule } from './rentals/rentals.module';
+import { ClientsModule } from './clients/clients.module';
+import { StripeService } from './rentals/stripe.service';
 
 @Module({
   imports: [
@@ -26,6 +29,8 @@ import { SharedModule } from './shared/shared.module';
     SlackModule,
     InvitationsModule,
     SharedModule,
+    RentalsModule,
+    ClientsModule,
   ],
   controllers: [AppController],
   providers: [
@@ -33,6 +38,7 @@ import { SharedModule } from './shared/shared.module';
       provide: APP_GUARD,
       useClass: PermissionsGuard,
     },
+    StripeService,
   ],
 })
 export class AppModule {}

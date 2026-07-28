@@ -13,4 +13,5 @@ export enum EmailSubjectEnum {
   Invitation = 'invitation',
   Resend = 'invitation-resend',
   Revoke = 'invitation-revoke',
+  Rental = 'rental-confirmation',
 }

@@ -69,7 +69,10 @@ export interface WelcomeContext {
   fullName: string;
 }
 
-export type MailContext = DeactivationContext | WelcomeContext;
+export type MailContext =
+  | DeactivationContext
+  | WelcomeContext
+  | RentalConfirmationContext;
 
 export type EmailSubject = `${EmailSubjectEnum}`;
 
@@ -79,3 +82,15 @@ export type SendEamilParams<T> = {
   templateName: EmailSubject;
   context?: T;
 };
+
+export interface RentalConfirmationContext {
+  clientName: string;
+  carBrand: string;
+  carModel: string;
+  startDate: string;
+  endDate: string;
+  totalPrice: number;
+  currency: string;
+  pickupLocation: string;
+  dropoffLocation: string;
+}

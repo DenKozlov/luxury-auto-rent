@@ -94,3 +94,17 @@ export interface ListInvitationsResponse {
   page: number;
   totalItems: number;
 }
+
+export interface Office {
+  id: string;
+  name: string;
+  address: string;
+  lat: number;
+  lng: number;
+  workingHours: string;
+  photoUrl: string;
+}
+
+export interface Rental {
+  id: string;
+}

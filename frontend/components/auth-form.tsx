@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { useState } from "react";
@@ -190,9 +190,7 @@ const AuthForm = ({
                     placeholder="Enter your full name"
                     aria-invalid={!!errors.name}
                   />
-                  <FieldDescription className="text-red-500">
-                    {errors.name?.message}
-                  </FieldDescription>
+                  <FieldError errors={[{ message: errors.name?.message }]} />
                 </Field>
               )}
             />
@@ -212,9 +210,7 @@ const AuthForm = ({
                     placeholder="Enter your email"
                     aria-invalid={!!errors.email}
                   />
-                  <FieldDescription className="text-red-500">
-                    {errors.email?.message}
-                  </FieldDescription>
+                  <FieldError errors={[{ message: errors.email?.message }]} />
                 </Field>
               )}
             />
@@ -246,9 +242,7 @@ const AuthForm = ({
                     {showPassword ? <Eye /> : <EyeOff />}
                   </Button>
                 </InputGroup>
-                <FieldDescription className="text-red-500">
-                  {errors.password?.message}
-                </FieldDescription>
+                <FieldError errors={[{ message: errors.password?.message }]} />
               </Field>
             )}
           />

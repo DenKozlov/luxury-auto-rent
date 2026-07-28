@@ -10,7 +10,8 @@ const logger = new Logger('Bootstrap');
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['error', 'warn', 'log'],
-    bodyParser: false,
+    // bodyParser: false,
+    rawBody: true,
   });
 
   app.connectMicroservice<MicroserviceOptions>({

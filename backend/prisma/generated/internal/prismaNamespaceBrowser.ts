@@ -57,7 +57,9 @@ export const ModelName = {
   Session: 'Session',
   Account: 'Account',
   Verification: 'Verification',
-  Invitation: 'Invitation'
+  Invitation: 'Invitation',
+  Rental: 'Rental',
+  Client: 'Client'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -80,6 +82,7 @@ export const CarScalarFieldEnum = {
   id: 'id',
   brand: 'brand',
   model: 'model',
+  licensePlate: 'licensePlate',
   year: 'year',
   mileage_km: 'mileage_km',
   body_type: 'body_type',
@@ -184,6 +187,43 @@ export const InvitationScalarFieldEnum = {
 } as const
 
 export type InvitationScalarFieldEnum = (typeof InvitationScalarFieldEnum)[keyof typeof InvitationScalarFieldEnum]
+
+
+export const RentalScalarFieldEnum = {
+  id: 'id',
+  clientId: 'clientId',
+  carId: 'carId',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  pickupLocation: 'pickupLocation',
+  dropoffLocation: 'dropoffLocation',
+  totalPrice: 'totalPrice',
+  status: 'status',
+  isPaid: 'isPaid',
+  stripeSessionId: 'stripeSessionId',
+  stripePaymentId: 'stripePaymentId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RentalScalarFieldEnum = (typeof RentalScalarFieldEnum)[keyof typeof RentalScalarFieldEnum]
+
+
+export const ClientScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  phone: 'phone',
+  firstName: 'firstName',
+  lastName: 'lastName',
+  dateOfBirth: 'dateOfBirth',
+  status: 'status',
+  driverLicenseNumber: 'driverLicenseNumber',
+  stripeCustomerId: 'stripeCustomerId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ClientScalarFieldEnum = (typeof ClientScalarFieldEnum)[keyof typeof ClientScalarFieldEnum]
 
 
 export const SortOrder = {

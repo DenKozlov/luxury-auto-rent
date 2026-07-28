@@ -1,7 +1,10 @@
 import { Controller, Inject } from '@nestjs/common';
 import { EventPattern, Payload } from '@nestjs/microservices';
 import { MailService } from './mail.service';
-import { DeactivationContext } from '../../common/types';
+import {
+  DeactivationContext,
+  RentalConfirmationContext,
+} from '../../common/types';
 import { EmailSubjectEnum } from '@/common/constants';
 
 @Controller('mail')
@@ -62,6 +65,18 @@ export class MailController {
       to: data.email,
       subject: 'Invitation Revoked',
       templateName: EmailSubjectEnum.Revoke,
+    });
+  }
+
+  @EventPattern('rental_success')
+  async handleRentalCreation(
+    @Payload() data: { email: string; context: RentalConfirmationContext },
+  ) {
+    await this.mailService.sendMail({
+      to: data.email,
+      subject: 'Car Rental Confirmation',
+      templateName: EmailSubjectEnum.Rental,
+      context: data.context,
     });
   }
 }
