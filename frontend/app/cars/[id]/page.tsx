@@ -1,4 +1,5 @@
 "use client";
+
 import { use } from "react";
 import { useQuery } from "@tanstack/react-query";
 
@@ -9,13 +10,18 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { carService } from "@/services/car.service";
 import Breadcrumbs from "@/components/breadcrumbs";
+import { RentalForm } from "@/components/rental-form";
+import { toast } from "sonner";
+import { useSearchParams } from "next/navigation";
 
 const AUTOPLAY_INTERVAL = 4000;
 
 const CarPage = ({ params }: { params: Promise<{ id: string }> }) => {
   const [current, setCurrent] = useState(0);
+  const searchParams = useSearchParams();
+  const success = searchParams.get("success");
+  const canceled = searchParams.get("canceled");
   const { id } = use(params);
-
   const { data: car, isLoading } = useQuery({
     queryKey: ["car", id],
     queryFn: () => carService.getById(id),
@@ -27,6 +33,19 @@ const CarPage = ({ params }: { params: Promise<{ id: string }> }) => {
     (n: number) => setCurrent((n + images.length) % images.length),
     [images.length],
   );
+
+  useEffect(() => {
+    if (success || canceled) {
+      const timer = setTimeout(() => {
+        if (success)
+          toast.success(
+            "Payment was successful! Your rental has been confirmed. Please check your email",
+          );
+        if (canceled) toast.error("Payment canceled");
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [success, canceled]);
 
   useEffect(() => {
     if (images.length <= 1) {
@@ -51,7 +70,7 @@ const CarPage = ({ params }: { params: Promise<{ id: string }> }) => {
   return (
     <div className="pb-4 py-8 pt-16">
       <Breadcrumbs bcpPages={["Details"]} />
-      <div className="w-[700px] mx-auto space-y-6 p-8 bg-[#1c1c1e]">
+      <div className="w-175 mx-auto space-y-6 p-8 rounded-lg border">
         {images.length > 0 ? (
           <div className="relative rounded-2xl overflow-hidden aspect-video bg-muted">
             <div
@@ -95,7 +114,7 @@ const CarPage = ({ params }: { params: Promise<{ id: string }> }) => {
                       key={i}
                       onClick={() => go(i)}
                       className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                        i === current ? "bg-white" : "bg-white/40"
+                        i === current ? "bg-white/10" : "bg-white/40"
                       }`}
                       aria-label={`Image ${i + 1}`}
                     />
@@ -111,9 +130,9 @@ const CarPage = ({ params }: { params: Promise<{ id: string }> }) => {
             </span>
           </div>
         )}
-        <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="flex items-start justify-between align-middle gap-4 flex-wrap">
           <div>
-            <h1 className="text-2xl font-medium text-white">
+            <h1 className="text-2xl font-medium">
               {car.brand} {car.model}
             </h1>
             <div className="flex gap-2 mt-2 flex-wrap">
@@ -141,9 +160,9 @@ const CarPage = ({ params }: { params: Promise<{ id: string }> }) => {
             </div>
           </div>
 
-          <div className="text-right text-white">
+          <div className="text-right">
             <p className="text-2xl font-medium">
-              {car.price_per_day_pln.toLocaleString()} zł
+              {car.price_per_day_pln.toLocaleString()} USD
             </p>
             <p className="text-sm text-muted-foreground">per day</p>
           </div>
@@ -174,14 +193,18 @@ const CarPage = ({ params }: { params: Promise<{ id: string }> }) => {
             ))}
           </div>
         </div>
-
-        <Button
+        <RentalForm
+          carName={`${car.brand} ${car.model}`}
+          pricePerDay={car.price_per_day_pln}
+          carId={id}
+        />
+        {/* <Button
           className="w-full h-12 bg-gray-500 text-lg hover:bg-gray-400 cursor-pointer"
           size="lg"
           disabled={!car.is_available}
         >
           {car.is_available ? "Book" : "Not available"}
-        </Button>
+        </Button> */}
       </div>
     </div>
   );

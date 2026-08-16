@@ -1,9 +1,7 @@
 "use client";
 
 import AuthForm from "@/components/auth-form";
-import { redirect, useSearchParams } from "next/navigation";
-// import { headers } from "next/headers";
-import { getSession } from "@/lib/actions/auth-actions";
+import { useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { invitationsService } from "@/services/invitations.service";
 
@@ -35,15 +33,6 @@ const SignInPage = () => {
     };
     return <div>{messages[reason] ?? "Invalid invitation"}</div>;
   }
-  // const { data: session } = await getSession({
-  //   fetchOptions: {
-  //     headers: await headers(),
-  //   },
-  // });
-
-  // if (session?.user) {
-  //   redirect("/");
-  // }
 
   return <AuthForm token={token} invitationEmail={validation.email} />;
 };

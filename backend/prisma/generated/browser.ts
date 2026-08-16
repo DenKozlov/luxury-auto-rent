@@ -52,3 +52,13 @@ export type Verification = Prisma.VerificationModel
  * 
  */
 export type Invitation = Prisma.InvitationModel
+/**
+ * Model Rental
+ * 
+ */
+export type Rental = Prisma.RentalModel
+/**
+ * Model Client
+ * 
+ */
+export type Client = Prisma.ClientModel

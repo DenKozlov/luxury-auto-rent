@@ -11,6 +11,7 @@ model Car {
   id                String   @id @default(uuid()) 
   brand             String
   model             String
+  licensePlate      String
   year              Int    
   mileage_km        Int     
   body_type         BodyType
@@ -22,6 +23,7 @@ model Car {
   createdAt         DateTime @default(now())
   images            CarImage[]
   rating            Float      @default(5.0)
+  rentals           Rental[]
 }
 
 model CarImage {
@@ -112,11 +114,45 @@ model Invitation {
   token     String?   @unique
   status    InvitationStatus @default(PENDING)
   invitedBy String 
-  user      User             @relation(fields: [invitedBy], references: [id])
+  user      User     @relation(fields: [invitedBy], references: [id])
   role      String   @default("user")
   expiresAt DateTime
   createdAt DateTime @default(now())
   acceptedAt DateTime?
+}
+
+model Rental {
+  id              String        @id @default(cuid())
+  clientId        String
+  client          Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  carId           String
+  car             Car           @relation(fields: [carId], references: [id])
+  startDate       DateTime
+  endDate         DateTime
+  pickupLocation  String
+  dropoffLocation String
+  totalPrice      Int           
+  status          RentalStatus  @default(PENDING)
+  isPaid          Boolean       @default(false)
+  stripeSessionId String?       @unique 
+  stripePaymentId String?       @unique
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model Client {
+  id                  String       @id @default(cuid())
+  email               String       @unique
+  phone               String       @unique
+  firstName           String
+  lastName            String
+  dateOfBirth         DateTime
+  status              ClientStatus @default(PENDING_ACTIVATION)
+  driverLicenseNumber String       @unique
+  stripeCustomerId    String?      @unique
+  rentals             Rental[]  
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
 }
 
 enum BodyType {
@@ -137,4 +173,19 @@ enum InvitationStatus {
   ACCEPTED
   REVOKED
   EXPIRED
+}
+
+enum ClientStatus {
+  PENDING_ACTIVATION
+  ACTIVE
+  BLOCKED
+}
+
+enum RentalStatus {
+  PENDING
+  CONFIRMED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+  FAILED
 }
